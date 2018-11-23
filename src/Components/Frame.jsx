@@ -1,18 +1,27 @@
 import React, { Component } from 'react';
-import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
+
+import Payment from './Fragments/Payment';
+import Balance from './Fragments/Balance';
+import PublicLedger from './Fragments/PublicLedger';
+
+const FRAGMENT_PAYMENT = 1;
+const FRAGMENT_BALANCE = 0;
+const FRAGMENT_PUBLICLEDGER = 2;
+
+const RATIO = 0.81;
 
 class Frame extends Component {
   constructor(props){
     super(props);
     this.state = {
-
+      fragmentID: FRAGMENT_PAYMENT,
+      height: window.innerHeight * RATIO
     }
+    this.handler = props.handler;
+  }
+
+  resize=()=>{
+    this.setState({height: window.innerHeight * RATIO});
   }
 
   componentWillMount(){
@@ -20,41 +29,29 @@ class Frame extends Component {
   }
 
   componentDidMount(){
-
+    window.addEventListener('resize', this.resize);
   }
 
   componentWillUnMount(){
+    window.removeEventListener('resize', this.resize);
+  }
 
+  changeFragment(fragmentID){
+    this.setState({fragmentID: fragmentID});
+  }
+
+  getFragmentID=()=>{
+    return this.state.fragmentID;
   }
 
   render(){
     return (
-      <Card style={{margin:"5%"}}>
-        <CardMedia
-          style={{width:"auto"}}
-          component="img"
-          alt="Image"
-          image="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"
-          title="Contemplative Reptile"
-        />
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="h2">
-            Lizard
-          </Typography>
-          <Typography component="p">
-            Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging
-            across all continents except Antarctica
-          </Typography>
-        </CardContent>
-        <CardActions>
-        <Button size="small" color="primary">
-          Share
-        </Button>
-        <Button size="small" color="primary">
-          Learn More
-        </Button>
-      </CardActions>
-      </Card>
+      <div style={{padding:"1.5%", minHeight:this.state.height}} id="container">
+        {
+          this.state.fragmentID === FRAGMENT_PAYMENT ? <Payment/> :
+          this.state.fragmentID === FRAGMENT_BALANCE ? <Balance/> : <PublicLedger/>
+        }
+      </div>
     )
   }
 }

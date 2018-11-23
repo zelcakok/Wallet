@@ -5,7 +5,33 @@ import AppTopBar from './AppTopBar';
 import Frame from './Frame';
 import AppBottomBar from './AppBottomBar';
 
-import Auth from '../../../blockchain/OAuth/Auth';
+import Login from './Login';
+
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+
+class Content extends Component {
+  constructor(props){
+    super(props);
+    this.state = {
+
+    }
+    this.handler = props.handler;
+    this.frameLayout = React.createRef();
+  }
+
+  changeFragment=(fragmentID)=>{
+    this.frameLayout.current.changeFragment(fragmentID);
+  }
+
+  render(){
+    return (
+      <div>
+        <Frame ref={this.frameLayout} handler={this.handler}/>
+        <AppBottomBar handler={this}/>
+      </div>
+    )
+  }
+}
 
 class Main extends Component {
   constructor(props){
@@ -13,6 +39,7 @@ class Main extends Component {
     this.state = {
 
     }
+    this.appbar = React.createRef();
   }
 
   componentWillMount(){
@@ -29,11 +56,13 @@ class Main extends Component {
 
   render(){
     return (
-      <div>
-        <AppTopBar/>
-        <Frame/>
-        <AppBottomBar/>
-      </div>
+      <Router>
+        <div>
+          <AppTopBar ref={this.appbar}/>
+          <Route exact path="/" render={()=><Content handler={this}/>}/>
+          <Route exact path="/Login" render={()=><Login/>}/>
+        </div>
+      </Router>
     )
   }
 }

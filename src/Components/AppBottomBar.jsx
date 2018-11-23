@@ -7,16 +7,26 @@ import AccountBalanceWalletIcon from '@material-ui/icons/AccountBalanceWallet';
 import PaymentIcon from '@material-ui/icons/Payment';
 import ChromeReaderModeIcon from '@material-ui/icons/ChromeReaderMode';
 
+import Divider from '@material-ui/core/Divider';
+import Frame from './Frame';
+
+
+//Colors
+import red from '@material-ui/core/colors/red';
+
 class AppBottomBar extends Component {
   constructor(props){
     super(props);
     this.state = {
-      value : 1
+      selectedTab : 0,
+      isLoggedIn: false
     }
+    this.handler = props.handler;
   }
 
   handleChange = (event, value) => {
-    this.setState({ value });
+    this.setState({ selectedTab : value});
+    this.handler.changeFragment(value);
   };
 
   componentWillMount(){
@@ -24,7 +34,7 @@ class AppBottomBar extends Component {
   }
 
   componentDidMount(){
-
+    this.setState({selectedTab: this.handler.frameLayout.current.getFragmentID()})
   }
 
   componentWillUnMount(){
@@ -33,15 +43,18 @@ class AppBottomBar extends Component {
 
   render(){
     return (
-      <BottomNavigation
-        style={{position:"fixed", width:"100%", bottom:"0px"}}
-        value={this.state.value}
-        onChange={this.handleChange}
-      >
-        <BottomNavigationAction label="Balance" icon={<AccountBalanceWalletIcon />} />
-        <BottomNavigationAction label="Payment" icon={<PaymentIcon />} />
-        <BottomNavigationAction label="Public Ledger" icon={<ChromeReaderModeIcon />} />
-      </BottomNavigation>
+      <div>
+        <Divider/>
+        <BottomNavigation
+          value={this.state.selectedTab}
+          onChange={this.handleChange}
+          showLabels
+        >
+          <BottomNavigationAction style={{color: this.state.selectedTab===0?red[500]:''}} label="Balance" icon={<AccountBalanceWalletIcon />}/>
+          <BottomNavigationAction style={{color: this.state.selectedTab===1?red[500]:''}} label="Payment" icon={<PaymentIcon />} />
+          <BottomNavigationAction style={{color: this.state.selectedTab===2?red[500]:''}} label="Public Ledger" icon={<ChromeReaderModeIcon />} />
+        </BottomNavigation>
+      </div>
     )
   }
 }
