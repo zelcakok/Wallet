@@ -31,10 +31,23 @@ import red from '@material-ui/core/colors/red';
 
 import Loader from './Loader';
 import Authenticator from '../Authenticator';
+import API from '../API';
 
 class Content extends Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      availBalance: 0,
+      ledger: null
+    }
+  }
+
   createData=(type, payer, payee, datetime, amount)=>{
     return { type, payer, payee, datetime, amount };
+  }
+
+  setAvailBalance=(balance)=>{
+    this.setState({availBalance: balance});
   }
 
   render(){
@@ -57,7 +70,7 @@ class Content extends Component {
               <Typography variant="h5">Available balance</Typography>
             </Grid>
             <Grid item>
-              <Typography variant="h5">HKD {(0).toFixed(2)}</Typography>
+              <Typography variant="h5">HKD {parseFloat(this.state.availBalance).toFixed(2)}</Typography>
             </Grid>
           </Grid>
           <Divider style={{margin:"2%"}}/>
@@ -123,8 +136,10 @@ class Balance extends Component {
     var cred = await this.auth.isLoggedIn();
     if(cred){
       this.setState({credential: cred, isLoggedIn: true});
+      var response = await API.profile();
       if(this.loader !== null){
         this.loader.dismiss(<Content ref={(content)=>this.content = content}/>, true);
+        this.content.setAvailBalance(response.data.ledger.balance);
       }
     }
   }

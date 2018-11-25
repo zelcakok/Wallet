@@ -5,8 +5,8 @@ class API {
   static BLOCKCHAIN_API_PORT = 5002;
   static REQUEST_AGENT = new https.Agent({ rejectUnauthorized: false });
 
-  static async profile(uid){
-    var url = API.getIPAddress()+"/profile?uid="+uid;
+  static async profile(){
+    var url = API.getIPAddress()+"/profile";
     return axios.get(url, { httpsAgent: API.REQUEST_AGENT });
   }
 

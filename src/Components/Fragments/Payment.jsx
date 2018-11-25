@@ -172,7 +172,7 @@ class Payment extends Component {
     var cred = await this.auth.isLoggedIn();
     if(cred){
       this.setState({credential: cred, isLoggedIn: true});
-      var response = await API.profile(cred.uid);
+      var response = await API.profile();
       if(this.loader !== null){
         this.loader.dismiss(<Content ref={(content)=>this.content = content}/>, true);
         this.content.setWalletAddr(response.data.walletAddr);
