@@ -75,19 +75,19 @@ class Content extends Component {
   }
 
   validation=()=>{
-    var valid = true;
+    var valid = {status: true, message: ""};
     var payerAddr = this.state.walletAddr;
     var payeeAddr = this.state.payeeAddr;
     var amount = this.state.paymentAmount;
 
-    if(payerAddr.length === 0) valid = false;
-    else if(payeeAddr.length === 0) valid = false;
-    else if(amount === "" || amount < 0) valid = false;
+    if(payerAddr.length === 0) { valid.status = false; valid.message = "System error: Wallet address is empty";}
+    else if(payeeAddr.length === 0 || payeeAddr === this.state.walletAddr) { valid.status = false; valid.message = "The payee address contains error.";}
+    else if(amount === "" || amount < 0) { valid.status = false; valid.message = "Please specify a valid amount.";}
 
-    if(!valid){
+    if(!valid.status){
       Swal({
         title: 'Payment Error',
-        text: 'The form contains error.',
+        text: valid.message,
         type: 'error',
         showCancelButton: false,
         confirmButtonText: 'Dismiss',
@@ -178,6 +178,7 @@ class Content extends Component {
                          margin="normal" variant="outlined"/>
 
               <Divider style={{marginTop:"5%", marginBottom:"2%"}}/>
+
               <Grid container direction="row">
                 <Grid item>
                   <Button variant="outlined" onClick={this.toggleScanner}>Scan QR Code</Button>
@@ -198,8 +199,6 @@ class Content extends Component {
                   </Grid>
                 </Grid>
               </Grid>
-
-
             </form>
           </CardContent>
         </Card>
@@ -249,6 +248,10 @@ class Payment extends Component {
         this.loader.dismiss(<Content ref={(content)=>this.content = content}/>, true);
         this.content.setWalletAddr(response.data.walletAddr);
       }
+    } else {
+      setTimeout(()=>{
+        this.loader.dismiss(null, false);
+      }, 1500);
     }
   }
 

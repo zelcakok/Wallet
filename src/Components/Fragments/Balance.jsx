@@ -23,6 +23,7 @@ import Paper from '@material-ui/core/Paper';
 import MoneyIcon from '@material-ui/icons/AttachMoney';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
+import AtmIcon from '@material-ui/icons/Atm';
 
 import moment from 'moment';
 
@@ -40,7 +41,9 @@ class Content extends Component {
       walletAddr: "",
       availBalance: 0,
       ledger: [],
-      lastUpdate: ""
+      lastUpdate: "",
+      creditCardAddr: "",
+      creditCardInputAmount: ""
     }
   }
 
@@ -76,64 +79,133 @@ class Content extends Component {
 
   render(){
     return (
-      <Card>
-        <CardHeader
-          avatar = {
-            <Avatar style={{backgroundColor: red[500]}}>
-              <MoneyIcon/>
-            </Avatar>
-          }
-          title="Balance" subheader={"Last update: " + this.state.lastUpdate}/>
-        <CardContent style={{textAlign:"center"}}>
-          <Grid container direction="row" justify="space-between">
-            <Grid item>
-              <Typography variant="h5">Available balance</Typography>
+      <div>
+        <Card style={{marginBottom:"2%"}}>
+          <CardHeader
+            avatar = {
+              <Avatar style={{backgroundColor: red[500]}}>
+                <MoneyIcon/>
+              </Avatar>
+            }
+            title="Balance" subheader={"Last update: " + this.state.lastUpdate}/>
+          <CardContent style={{textAlign:"center"}}>
+            <Grid container direction="row" justify="space-between">
+              <Grid item>
+                <Typography variant="h5">Available balance</Typography>
+              </Grid>
+              <Grid item>
+                <Typography variant="h5">HKD {parseFloat(this.state.availBalance).toFixed(2)}</Typography>
+              </Grid>
             </Grid>
-            <Grid item>
-              <Typography variant="h5">HKD {parseFloat(this.state.availBalance).toFixed(2)}</Typography>
-            </Grid>
-          </Grid>
-          <Divider style={{margin:"2%"}}/>
-          <Paper style={{overflowX:"auto"}}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Transaction</TableCell>
-                  <TableCell>Payer</TableCell>
-                  <TableCell>Payee</TableCell>
-                  <TableCell>Date time</TableCell>
-                  <TableCell numeric>Amount (HKD)</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {
-                  this.state.ledger !== null ?
-                    this.state.ledger.map(row => {
-                    return (
-                      <TableRow key={row.id}>
-                        <TableCell component="th" scope="row">
-                          {row.type}
-                        </TableCell>
-                        <TableCell>{row.payer}</TableCell>
-                        <TableCell>{row.payee}</TableCell>
-                        <TableCell>{row.datetime}</TableCell>
-                        <TableCell
-                          style={{color: row.type==="Pay"? red[500] : ""}}
-                          numeric>
-                          {
-                            row.type === "Pay" ?
-                            "("+row.amount.toFixed(2)+")" : row.amount.toFixed(2)
-                          }
+            <Divider style={{margin:"2%"}}/>
+            <Paper style={{overflowX:"auto"}}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Transaction</TableCell>
+                    <TableCell>Payer</TableCell>
+                    <TableCell>Payee</TableCell>
+                    <TableCell>Date time</TableCell>
+                    <TableCell numeric>Amount (HKD)</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {
+                    this.state.ledger.length > 0 ?
+                      this.state.ledger.map(row => {
+                      return (
+                        <TableRow key={row.id}>
+                          <TableCell component="th" scope="row">
+                            {row.type}
+                          </TableCell>
+                          <TableCell>{row.payer}</TableCell>
+                          <TableCell>{row.payee}</TableCell>
+                          <TableCell>{row.datetime}</TableCell>
+                          <TableCell
+                            style={{color: row.type==="Pay"? red[500] : ""}}
+                            numeric>
+                            {
+                              row.type === "Pay" ?
+                              "("+row.amount.toFixed(2)+")" : row.amount.toFixed(2)
+                            }
+                          </TableCell>
+                        </TableRow>
+                      )})
+                      :
+                      <TableRow>
+                        <TableCell colSpan="5" style={{textAlign:"center", color:"grey"}}>
+                          There is no transactions.
                         </TableCell>
                       </TableRow>
-                    )})
-                    : null
-                }
-              </TableBody>
-            </Table>
-          </Paper>
-        </CardContent>
-      </Card>
+                  }
+                </TableBody>
+              </Table>
+            </Paper>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader
+            avatar = {
+              <Avatar style={{backgroundColor: red[500]}}>
+                <AtmIcon/>
+              </Avatar>
+            }
+            title="Top Up Balance" subheader="Transfer money to your wallet."/>
+          <CardContent style={{textAlign:"center"}}>
+            <form noValidate autoComplete="off">
+              <Grid
+                container
+                direction="row"
+                justify="flex-end"
+                alignItems="center"
+              >
+                <Grid item xs={8}>
+                  <TextField id="payeeAddr" placeholder="Type the credit card number here." fullWidth
+                             label="Credit card number" fullWidth
+                             value={this.state.creditCardAddr} required
+                             onChange={this.updateCreditCardAddr}
+                             margin="normal" variant="outlined"/>
+                </Grid>
+                <Grid item xs={4}>
+                  <TextField id="amount" label="Security Code"
+                             placeholder="000 / 0000" fullWidth
+                             onChange={this.updateCreditCardInputAmount}
+                             value={this.state.creditCardInputAmount} type="number"
+                             InputLabelProps={{ shrink: true, min: 0, step: 0 }}
+                             margin="normal" variant="outlined"/>
+                </Grid>
+              </Grid>
+              <TextField id="amount" label="Amount"
+                         placeholder="HKD 0.00" fullWidth
+                         onChange={this.updatePaymentAmount}
+                         value={this.state.paymentAmount} type="number"
+                         InputLabelProps={{ shrink: true, min: 0, step: 1 }}
+                         margin="normal" variant="outlined"/>
+
+              <Divider style={{marginTop:"5%", marginBottom:"2%"}}/>
+
+              <Grid container direction="row">
+                <Grid item xs>
+                  <Grid
+                    container
+                    direction="row"
+                    justify="flex-end"
+                    alignItems="center"
+                  >
+                  <Grid item style={{marginLeft:"2%"}}>
+                    <Button variant="outlined" onClick={this.clearForm}>Clear</Button>
+                  </Grid>
+                  <Grid item style={{marginLeft:"2%"}}>
+                    <Button style={{color:red[500]}} variant="outlined" onClick={this.payment}>Transfer</Button>
+                  </Grid>
+                  </Grid>
+                </Grid>
+              </Grid>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     )
   }
 }
@@ -166,6 +238,10 @@ class Balance extends Component {
         this.content.setAvailBalance(response.data.ledger.balance);
         this.content.setLedger(response.data.ledger.ledger);
       }
+    } else {
+      setTimeout(()=>{
+        this.loader.dismiss(null, false);
+      }, 1500);
     }
   }
 
