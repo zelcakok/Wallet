@@ -108,6 +108,7 @@ class Content extends Component {
       confirmButtonText: 'Yes',
       cancelButtonText: 'Cancel'
     }).then(async (result) => {
+      if(result.hasOwnProperty("dismiss")) return;
       var email = await this.auth.isLoggedIn();
       email = email.username + "@blockchain.com";
       var password = result.value;
