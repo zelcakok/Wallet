@@ -121,7 +121,24 @@ class Content extends Component {
         payeeAddr: payeeAddr,
         amount: amount
       }).then((response)=>{
-        console.log("Payment response: ", response);
+        if(!response.status) {
+          Swal({
+            title: 'Payment Error',
+            text: response.message,
+            type: 'error',
+            showCancelButton: false,
+            confirmButtonText: 'Dismiss',
+          })
+        }
+        else {
+          Swal({
+            title: 'Payment created successfully',
+            text: 'The transaction will be settled in 10 minutes.',
+            type: 'info',
+            showCancelButton: false,
+            confirmButtonText: 'Dismiss',
+          })
+        }
       })
     })
   }
