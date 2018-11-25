@@ -15,6 +15,14 @@ class API {
     return axios.get(url, { httpsAgent: API.REQUEST_AGENT });
   }
 
+  static async payment(params){
+    var query = "digest="+params.digest;
+    query += "&payeeAddr="+params.payeeAddr;
+    query += "&amount="+params.amount;
+    var url = API.getIPAddress()+"/payment?"+query;
+    return axios.get(url, { httpsAgent: API.REQUEST_AGENT });
+  }
+
   static getIPAddress(){
     var urlTokens = window.location.href.split(":");
     return [urlTokens[0], urlTokens[1], "5002"].join(":");

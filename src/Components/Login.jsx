@@ -52,7 +52,6 @@ class Login extends Component {
     API.verify(digest).then((result)=>{
       if(result.data === true){
         this.emailAuth(email, password).then((cred)=>{
-          Intermediate.store("credential", cred);
           window.location = "/";
         });
       }

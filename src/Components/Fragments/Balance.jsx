@@ -37,24 +37,44 @@ class Content extends Component {
   constructor(props){
     super(props);
     this.state = {
+      walletAddr: "",
       availBalance: 0,
-      ledger: null
+      ledger: [],
+      lastUpdate: ""
     }
   }
 
-  createData=(type, payer, payee, datetime, amount)=>{
-    return { type, payer, payee, datetime, amount };
+  createData=(id, type, payer, payee, datetime, amount)=>{
+    return { id, type, payer, payee, datetime, amount };
+  }
+
+  setLastUpdate=(timestamp)=>{
+    this.setState({lastUpdate: moment(timestamp).format("DD/MM/YY hh:mm:ss A")})
+  }
+
+  setWalletAddr=(walletAddr)=>{
+    this.setState({walletAddr: walletAddr});
   }
 
   setAvailBalance=(balance)=>{
     this.setState({availBalance: balance});
   }
 
+  setLedger=(ledger)=>{
+    var tmp = this.state.ledger;
+    Object.keys(ledger).map((paymentID)=>{
+      var row = null;
+      var payment = ledger[paymentID];
+      if(payment.delta > 0)
+        row = this.createData(paymentID, "Receive", payment.target, "You", moment(payment.timestamp).format("DD/MM/YY hh:mm A"), payment.delta);
+      else
+        row = this.createData(paymentID, "Pay", "You", payment.target, moment(payment.timestamp).format("DD/MM/YY hh:mm A"), Math.abs(payment.delta));
+      tmp.push(row);
+    })
+    this.setState({ledger: tmp});
+  }
+
   render(){
-    const rows = [
-      this.createData('Pay', 'Zelca Kok', 'Sarah Hui', moment().format("DD/MM/YY hh:mm A"), 24.0),
-      this.createData('Receive', 'Sarah Hui', 'Zelca Kok', moment().format("DD/MM/YY hh:mm A"), 10.0)
-    ];
     return (
       <Card>
         <CardHeader
@@ -63,7 +83,7 @@ class Content extends Component {
               <MoneyIcon/>
             </Avatar>
           }
-          title="Balance" subheader="Shows up to 30 transactions"/>
+          title="Balance" subheader={"Last update: " + this.state.lastUpdate}/>
         <CardContent style={{textAlign:"center"}}>
           <Grid container direction="row" justify="space-between">
             <Grid item>
@@ -86,26 +106,29 @@ class Content extends Component {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map(row => {
-                  return (
-                    <TableRow key={row.id}>
-                      <TableCell component="th" scope="row">
-                        {row.type}
-                      </TableCell>
-                      <TableCell>{row.payer}</TableCell>
-                      <TableCell>{row.payee}</TableCell>
-                      <TableCell>{row.datetime}</TableCell>
-                      <TableCell
-                        style={{color: row.type==="Pay"? red[500] : ""}}
-                        numeric>
-                        {
-                          row.type === "Pay" ?
-                          "("+row.amount.toFixed(2)+")" : row.amount.toFixed(2)
-                        }
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
+                {
+                  this.state.ledger !== null ?
+                    this.state.ledger.map(row => {
+                    return (
+                      <TableRow key={row.id}>
+                        <TableCell component="th" scope="row">
+                          {row.type}
+                        </TableCell>
+                        <TableCell>{row.payer}</TableCell>
+                        <TableCell>{row.payee}</TableCell>
+                        <TableCell>{row.datetime}</TableCell>
+                        <TableCell
+                          style={{color: row.type==="Pay"? red[500] : ""}}
+                          numeric>
+                          {
+                            row.type === "Pay" ?
+                            "("+row.amount.toFixed(2)+")" : row.amount.toFixed(2)
+                          }
+                        </TableCell>
+                      </TableRow>
+                    )})
+                    : null
+                }
               </TableBody>
             </Table>
           </Paper>
@@ -139,7 +162,9 @@ class Balance extends Component {
       var response = await API.profile();
       if(this.loader !== null){
         this.loader.dismiss(<Content ref={(content)=>this.content = content}/>, true);
+        this.content.setLastUpdate(response.data.ledger.lastUpdate);
         this.content.setAvailBalance(response.data.ledger.balance);
+        this.content.setLedger(response.data.ledger.ledger);
       }
     }
   }

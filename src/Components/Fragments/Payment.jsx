@@ -19,6 +19,8 @@ import Divider from '@material-ui/core/Divider';
 //Libraries
 import QRCode from 'qrcode.react';
 import QrReader from "react-qr-reader";
+import Swal from 'sweetalert2';
+import crypto from 'crypto';
 
 //Colors
 import red from '@material-ui/core/colors/red';
@@ -38,6 +40,7 @@ class Content extends Component {
       paymentAmount: "",
       walletAddr: ""
     }
+    this.auth = Authenticator.getInstance();
     this.handleScan = this.handleScan.bind(this);
   }
 
@@ -69,6 +72,57 @@ class Content extends Component {
   handleError=(err)=>{
     alert("QR code scanner requires a camera.");
     this.toggleScanner()
+  }
+
+  validation=()=>{
+    var valid = true;
+    var payerAddr = this.state.walletAddr;
+    var payeeAddr = this.state.payeeAddr;
+    var amount = this.state.paymentAmount;
+
+    if(payerAddr.length === 0) valid = false;
+    else if(payeeAddr.length === 0) valid = false;
+    else if(amount === "" || amount < 0) valid = false;
+
+    if(!valid){
+      Swal({
+        title: 'Payment Error',
+        text: 'The form contains error.',
+        type: 'error',
+        showCancelButton: false,
+        confirmButtonText: 'Dismiss',
+      }).then(()=>{return false})
+    } else return [payerAddr, payeeAddr, amount];
+  }
+
+  payment=()=>{
+    var form = this.validation();
+    if(!form) return;
+    Swal({
+      title: 'Verification',
+      text: 'The transaction will be settled in 10 minutes.',
+      input: 'password',
+      inputPlaceholder: 'Please enter your password here.',
+      type: 'info',
+      showCancelButton: true,
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'Cancel'
+    }).then(async (result) => {
+      var email = await this.auth.isLoggedIn();
+      email = email.username + "@blockchain.com";
+      var password = result.value;
+      var digest = crypto.createHash("sha256").update(email+password).digest("hex");
+      var payerAddr = this.state.walletAddr;
+      var payeeAddr = this.state.payeeAddr;
+      var amount = this.state.paymentAmount;
+      API.payment({
+        digest: digest,
+        payeeAddr: payeeAddr,
+        amount: amount
+      }).then((response)=>{
+        console.log("Payment response: ", response);
+      })
+    })
   }
 
   render(){
@@ -121,7 +175,7 @@ class Content extends Component {
                     <Button variant="outlined" onClick={this.clearForm}>Clear</Button>
                   </Grid>
                   <Grid item style={{marginLeft:"2%"}}>
-                    <Button style={{color:red[500]}} variant="outlined">Pay</Button>
+                    <Button style={{color:red[500]}} variant="outlined" onClick={this.payment}>Pay</Button>
                   </Grid>
                   </Grid>
                 </Grid>
