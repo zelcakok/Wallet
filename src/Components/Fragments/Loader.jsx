@@ -40,7 +40,7 @@ class Loader extends Component {
     } else if(this.state.isLoggedIn) return this.state.content;
     return (
       <div style={{textAlign:"center", marginTop:"40%"}}>
-        <div style={{color:"grey"}}>Please login first</div>
+        <div style={{color:"grey"}}>Please login to the Wallet system.</div>
       </div>
     )
   }
