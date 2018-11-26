@@ -10,6 +10,11 @@ class API {
     return axios.get(url, { httpsAgent: API.REQUEST_AGENT });
   }
 
+  static async blocks(){
+    var url = API.getIPAddress()+"/blocks";
+    return axios.get(url, { httpsAgent: API.REQUEST_AGENT });
+  }
+
   static async verify(digest){
     var url = API.getIPAddress()+"/verify?digest="+digest;
     return axios.get(url, { httpsAgent: API.REQUEST_AGENT });

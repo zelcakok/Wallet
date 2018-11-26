@@ -213,40 +213,22 @@ class Content extends Component {
 class Balance extends Component {
   constructor(props){
     super(props);
-    this.state = {
-      credential: null,
-      isLoggedIn : false
-    }
-    this.auth = Authenticator.getInstance();
-    this.auth.isLoggedIn().then((cred)=>{
-      if(cred) this.setState({credential: cred, isLoggedIn: true})
-    });
-  }
-
-  componentWillMount(){
-
+    this.handler = props.handler;
   }
 
   async componentDidMount(){
-    var cred = await this.auth.isLoggedIn();
-    if(cred){
-      this.setState({credential: cred, isLoggedIn: true});
-      var response = await API.profile();
+    if(await this.handler.fetchProfile()){
       if(this.loader !== null){
         this.loader.dismiss(<Content ref={(content)=>this.content = content}/>, true);
-        this.content.setLastUpdate(response.data.ledger.lastUpdate);
-        this.content.setAvailBalance(response.data.ledger.balance);
-        this.content.setLedger(response.data.ledger.ledger);
+        this.content.setLastUpdate(this.handler.state.profile.ledger.lastUpdate);
+        this.content.setAvailBalance(this.handler.state.profile.ledger.balance);
+        this.content.setLedger(this.handler.state.profile.ledger.ledger);
       }
     } else {
       setTimeout(()=>{
         this.loader.dismiss(null, false);
       }, 1500);
     }
-  }
-
-  componentWillUnMount(){
-
   }
 
   render(){

@@ -14,7 +14,7 @@ class Frame extends Component {
   constructor(props){
     super(props);
     this.state = {
-      fragmentID: FRAGMENT_BALANCE,
+      fragmentID: FRAGMENT_PUBLICLEDGER,
       height: window.innerHeight * RATIO
     }
     this.handler = props.handler;
@@ -48,8 +48,8 @@ class Frame extends Component {
     return (
       <div style={{padding:"1.5%", minHeight:this.state.height}} id="container">
         {
-          this.state.fragmentID === FRAGMENT_PAYMENT ? <Payment/> :
-          this.state.fragmentID === FRAGMENT_BALANCE ? <Balance/> : <PublicLedger/>
+          this.state.fragmentID === FRAGMENT_PAYMENT ? <Payment handler={this.handler}/> :
+          this.state.fragmentID === FRAGMENT_BALANCE ? <Balance handler={this.handler}/> : <PublicLedger handler={this.handler}/>
         }
       </div>
     )

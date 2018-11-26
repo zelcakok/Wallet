@@ -25,7 +25,6 @@ import crypto from 'crypto';
 //Colors
 import red from '@material-ui/core/colors/red';
 
-import Intermediate from '../Intermediate';
 import API from '../API';
 import Authenticator from '../Authenticator';
 import Loader from './Loader';
@@ -223,30 +222,14 @@ class Content extends Component {
 class Payment extends Component {
   constructor(props){
     super(props);
-    this.state = {
-      credential: null,
-      isLoggedIn: false,
-      profile: null
-    }
-    this.auth = Authenticator.getInstance();
-  }
-
-  componentWillMount(){
-    this.auth.isLoggedIn().then((cred)=>{
-      if(cred) {
-        this.setState({credential: cred, isLoggedIn: true})
-      }
-    });
+    this.handler = props.handler;
   }
 
   async componentDidMount(){
-    var cred = await this.auth.isLoggedIn();
-    if(cred){
-      this.setState({credential: cred, isLoggedIn: true});
-      var response = await API.profile();
+    if(await this.handler.fetchProfile()){
       if(this.loader !== null){
         this.loader.dismiss(<Content ref={(content)=>this.content = content}/>, true);
-        this.content.setWalletAddr(response.data.walletAddr);
+        this.content.setWalletAddr(this.handler.state.profile.walletAddr);
       }
     } else {
       setTimeout(()=>{

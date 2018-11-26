@@ -1,337 +1,253 @@
-import React from 'react';
-import classNames from 'classnames';
+import React, { Component } from 'react';
+
+//Material UI
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import Divider from '@material-ui/core/Divider';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import TextField from '@material-ui/core/TextField';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
+import CardContent from '@material-ui/core/CardContent';
+import CardActions from '@material-ui/core/CardActions';
+import Button from '@material-ui/core/Button';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
-import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
-import Checkbox from '@material-ui/core/Checkbox';
-import IconButton from '@material-ui/core/IconButton';
-import Tooltip from '@material-ui/core/Tooltip';
-import DeleteIcon from '@material-ui/icons/Delete';
-import FilterListIcon from '@material-ui/icons/FilterList';
-import { lighten } from '@material-ui/core/styles/colorManipulator';
+import Avatar from '@material-ui/core/Avatar';
 
-import TextField from '@material-ui/core/TextField';
-import Button  from '@material-ui/core/Button';
-import Grid  from '@material-ui/core/Grid';
+import BlockIcon from '@material-ui/icons/Dashboard';
 
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Dialog from '@material-ui/core/Dialog';
-import ViewIcon from '@material-ui/icons/RemoveRedEye';
 
+//Libraries
+import QRCode from 'qrcode.react';
+import QrReader from "react-qr-reader";
+import Swal from 'sweetalert2';
+import crypto from 'crypto';
 import moment from 'moment';
 
 //Colors
 import red from '@material-ui/core/colors/red';
 
-let counter = 0;
-function createData(blockAddr, type, payer, payee, datetime, amount) {
-  counter += 1;
-  return { id: counter, blockAddr, type, payer, payee, datetime, amount};
-}
+import API from '../API';
+import Authenticator from '../Authenticator';
+import Loader from './Loader';
 
-function desc(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-function stableSort(array, cmp) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = cmp(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map(el => el[0]);
-}
-
-function getSorting(order, orderBy) {
-  return order === 'desc' ? (a, b) => desc(a, b, orderBy) : (a, b) => -desc(a, b, orderBy);
-}
-
-const rows = [
-  { id: 'transType', numeric: false, label: 'Transaction' },
-  { id: 'payer', numeric: false, label: 'Payer' },
-  { id: 'payee', numeric: false,  label: 'Payee' },
-  { id: 'datetime', numeric: false, label: 'Date time' },
-  { id: 'amount', numeric: true,  label: 'Amount (HKD)' },
-  { id: 'details', numeric: false,  label: 'Details' },
-];
-
-class EnhancedTableHead extends React.Component {
-  createSortHandler = property => event => {
-    this.props.onRequestSort(event, property);
-  };
-
-  render() {
-    const { order, orderBy, numSelected, rowCount } = this.props;
-
-    return (
-      <TableHead>
-        <TableRow>
-          {rows.map(row => {
-            return (
-              <TableCell
-                key={row.id}
-                numeric={row.numeric}
-                sortDirection={orderBy === row.id ? order : false}
-              >
-                <Tooltip
-                  title="Sort"
-                  placement={row.numeric ? 'bottom-end' : 'bottom-start'}
-                  enterDelay={300}
-                >
-                  <TableSortLabel
-                    active={orderBy === row.id}
-                    direction={order}
-                    onClick={this.createSortHandler(row.id)}
-                  >
-                    {row.label}
-                  </TableSortLabel>
-                </Tooltip>
-              </TableCell>
-            );
-          }, this)}
-        </TableRow>
-      </TableHead>
-    );
-  }
-}
-
-EnhancedTableHead.propTypes = {
-  numSelected: PropTypes.number.isRequired,
-  onRequestSort: PropTypes.func.isRequired,
-  order: PropTypes.string.isRequired,
-  orderBy: PropTypes.string.isRequired,
-  rowCount: PropTypes.number.isRequired,
-};
-
-const toolbarStyles = theme => ({
-  root: {
-    paddingRight: theme.spacing.unit,
-  },
-  highlight:
-    theme.palette.type === 'light'
-      ? {
-          color: theme.palette.secondary.main,
-          backgroundColor: lighten(theme.palette.secondary.light, 0.85),
-        }
-      : {
-          color: theme.palette.text.primary,
-          backgroundColor: theme.palette.secondary.dark,
-        },
-  spacer: {
-    flex: '1 1 100%',
-  },
-  actions: {
-    color: theme.palette.text.secondary,
-  },
-  title: {
-    flex: '0 0 auto',
-  },
-});
-
-const styles = theme => ({
-  root: {
-    width: '100%',
-    marginTop: theme.spacing.unit * 3,
-  },
-  table: {
-    // minWidth: 1020,
-  },
-  tableWrapper: {
-    overflowX: 'auto',
-  },
-});
-
-class PublicLedger extends React.Component {
-  state = {
-    order: 'asc',
-    orderBy: 'calories',
-    selected: [],
-    data: [
-      createData('2913809238402934', 'Pay', 'Zelca Kok', 'Sarah Hui', moment().format("DD/MM/YY hh:mm A"), 4.3),
-      createData('2913809238402934', 'Pay', 'Zelca Kok', 'Sarah Hui', moment().format("DD/MM/YY hh:mm A"), 4.3),
-      createData('2913809238402934', 'Pay', 'Zelca Kok', 'Sarah Hui', moment().format("DD/MM/YY hh:mm A"), 4.3),
-      createData('2913809238402934', 'Pay', 'Zelca Kok', 'Sarah Hui', moment().format("DD/MM/YY hh:mm A"), 4.3),
-      createData('2913809238402934', 'Pay', 'Zelca Kok', 'Sarah Hui', moment().format("DD/MM/YY hh:mm A"), 4.3),
-      createData('2913809238402934', 'Pay', 'Zelca Kok', 'Sarah Hui', moment().format("DD/MM/YY hh:mm A"), 4.3),
-      createData('2913809238402934', 'Pay', 'Zelca Kok', 'Sarah Hui', moment().format("DD/MM/YY hh:mm A"), 4.3),
-      createData('2913809238402934', 'Pay', 'Zelca Kok', 'Sarah Hui', moment().format("DD/MM/YY hh:mm A"), 4.3),
-      createData('2913809238402934', 'Pay', 'Zelca Kok', 'Sarah Hui', moment().format("DD/MM/YY hh:mm A"), 4.3),
-      createData('2913809238402934', 'Pay', 'Zelca Kok', 'Sarah Hui', moment().format("DD/MM/YY hh:mm A"), 4.3),
-      createData('2913809238402934', 'Pay', 'Zelca Kok', 'Sarah Hui', moment().format("DD/MM/YY hh:mm A"), 4.3),
-      createData('2913809238402934', 'Pay', 'Zelca Kok', 'Sarah Hui', moment().format("DD/MM/YY hh:mm A"), 4.3),
-      createData('2913809238402934', 'Pay', 'Zelca Kok', 'Sarah Hui', moment().format("DD/MM/YY hh:mm A"), 4.3),
-      createData('2913809238402934', 'Pay', 'Zelca Kok', 'Sarah Hui', moment().format("DD/MM/YY hh:mm A"), 4.3),
-      createData('2913809238402934', 'Pay', 'Zelca Kok', 'Sarah Hui', moment().format("DD/MM/YY hh:mm A"), 4.3),
-    ],
-    page: 0,
-    rowsPerPage: 5,
-    isDetailShowed: false
-  };
-
-  handleRequestSort = (event, property) => {
-    const orderBy = property;
-    let order = 'desc';
-
-    if (this.state.orderBy === property && this.state.order === 'desc') {
-      order = 'asc';
+class Content extends Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      blockDetails: "",
+      transDetails: "",
+      blocks: null
     }
-
-    this.setState({ order, orderBy });
-  };
-
-  handleChangePage = (event, page) => {
-    this.setState({ page });
-  };
-
-  handleChangeRowsPerPage = event => {
-    this.setState({ rowsPerPage: event.target.value });
-  };
-
-  handleClose = () => {
-    this.setState({ isDetailShowed: false });
-  };
-
-  viewDetails=(blockAddr)=>{
-    this.setState({isDetailShowed: true});
   }
 
-  render() {
-    const { classes } = this.props;
-    const { data, order, orderBy, selected, rowsPerPage, page } = this.state;
-    const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
+  setBlocks=(blocks)=>{
+    this.setState({blocks: blocks});
+  }
 
+  getCardWidth=()=>{
+    if(window.innerWidth > 1000) return 700;
+    else return window.innerWidth * 0.95;
+  }
+
+  genBlockCard=(blockAddr, block)=>{
     return (
-      <div>
-        <Paper className={classes.root}>
-          <div className={classes.tableWrapper}>
-            <Table className={classes.table} aria-labelledby="tableTitle">
-              <EnhancedTableHead
-                numSelected={selected.length}
-                order={order}
-                orderBy={orderBy}
-                onRequestSort={this.handleRequestSort}
-                rowCount={data.length}
-              />
-              <TableBody>
-                {stableSort(data, getSorting(order, orderBy))
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map(n => {
-                    return (
-                      <TableRow
-                        tabIndex={-1}
-                        key={n.id}
-                      >
-                        <TableCell component="th">
-                          {n.type}
-                        </TableCell>
-                        <TableCell>{n.payer}</TableCell>
-                        <TableCell>{n.payee}</TableCell>
-                        <TableCell>{n.datetime}</TableCell>
-                        <TableCell
-                          style={{color: n.type==="Pay"? red[500] : ""}}
-                          numeric>
-                          {
-                            n.type === "Pay" ?
-                            "("+n.amount.toFixed(2)+")" : n.amount.toFixed(2)
-                          }
-                        </TableCell>
-                        <TableCell>
-                          <IconButton onClick={()=>this.viewDetails(n.blockAddr)}>
-                            <ViewIcon/>
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                {emptyRows > 0 && (
-                  <TableRow style={{ height: 49 * emptyRows }}>
-                    <TableCell colSpan={6} />
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={data.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            backIconButtonProps={{
-              'aria-label': 'Previous Page',
-            }}
-            nextIconButtonProps={{
-              'aria-label': 'Next Page',
-            }}
-            onChangePage={this.handleChangePage}
-            onChangeRowsPerPage={this.handleChangeRowsPerPage}
-          />
-        </Paper>
-        <Dialog open={this.state.isDetailShowed} onClose={this.handleClose} fullWidth>
-          <DialogTitle id="simple-dialog-title">Block details</DialogTitle>
-          <DialogContent>
+      <Card key={blockAddr+"_card"} style={{marginBottom:"2%", width:this.getCardWidth(), overflowX:"auto"}}>
+        <CardHeader
+          avatar = {
+            <Avatar style={{backgroundColor: red[500]}}>
+              <BlockIcon/>
+            </Avatar>
+          }
+          title={
+            <Grid container justify="flex-start">
+              <Grid item style={{marginRight:"2%"}}>
+                <div>Block address</div>
+              </Grid>
+              <Grid item>
+                <div>{blockAddr}</div>
+              </Grid>
+            </Grid>
+          }
+          subheader={
             <div>
-              <Grid container direction="column">
-                <Grid item>
-                  <TextField id="blockAddr" fullWidth
-                             label="Block Address"
-                             value={"31249390434"} disabled
-                             margin="normal" variant="outlined"/>
+              <Grid container justify="flex-start">
+                <Grid item style={{marginRight:"4.1%"}}>
+                  <div>Block hash</div>
                 </Grid>
                 <Grid item>
-                  <TextField id="prevHash" fullWidth
-                             label="Previous Block Hash"
-                             value={"0x932523423k432lk4h3"} disabled
-                             margin="normal" variant="outlined"/>
+                  <div>{block.hash}</div>
+                </Grid>
+              </Grid>
+              <Grid container justify="flex-start">
+                <Grid item style={{marginRight:"1.8%"}}>
+                  <div>Previous hash</div>
                 </Grid>
                 <Grid item>
-                  <TextField id="blockHash" fullWidth
-                             label="Current Block Hash"
-                             value={"0x324lk23j32k4j34"} disabled
-                             margin="normal" variant="outlined"/>
-                </Grid>
-                <Grid item>
-                  <TextField id="nonce" fullWidth
-                             label="Nonce"
-                             value={"3434"} disabled
-                             margin="normal" variant="outlined"/>
-                </Grid>
-                <Grid item>
-                  <TextField id="difficulty" fullWidth
-                             label="Difficulty"
-                             value={"6"} disabled
-                             margin="normal" variant="outlined"/>
+                  <div>{block.prevHash ? block.prevHash : "No previous block for the genesis block."}</div>
                 </Grid>
               </Grid>
             </div>
-          </DialogContent>
-        </Dialog>
+          }/>
+        <Divider style={{marginLeft:"2%", marginRight:"2%"}}/>
+        <CardActions>
+          <Grid container direction="row" justify="space-between">
+            <Grid item>
+              <Button variant="outlined" style={this.getBlockBtnStyle(blockAddr)} onClick={()=>this.toggleBlockDetails(blockAddr)}>Block Details</Button>
+            </Grid>
+            <Grid item>
+              <Button variant="outlined" style={this.getTransBtnStyle(blockAddr)} onClick={()=>this.toggleTransDetails(blockAddr)}>Transaction Details</Button>
+            </Grid>
+          </Grid>
+        </CardActions>
+        {
+          this.state.blockDetails === blockAddr ?
+            <CardContent>
+              { this.fillBlockInfo(blockAddr, block) }
+            </CardContent>  : null
+        }
+        {
+          this.state.transDetails === blockAddr ?
+            <CardContent>
+              { this.fillTransInfo(blockAddr, block) }
+            </CardContent>  : null
+        }
+      </Card>
+    )
+  }
+
+  getTransBtnStyle=(blockAddr)=>{
+    var isActive = this.state.transDetails === blockAddr;
+    return {
+      color: isActive ? "white" : red[500],
+      backgroundColor: isActive ? red[400] : "white"
+    }
+  }
+
+  getBlockBtnStyle=(blockAddr)=>{
+    var isActive = this.state.blockDetails === blockAddr;
+    return {
+      color: isActive ? "white" : red[500],
+      backgroundColor: isActive ? red[400] : "white"
+    }
+  }
+
+  fillBlockInfo=(blockAddr, block)=>{
+    return (
+      <div style={{padding:"1%"}} key={blockAddr+"_info"}>
+        <TextField style={{marginBottom:"2%"}} variant="outlined" label="Block Address" value={blockAddr} fullWidth disabled/>
+        <TextField style={{marginBottom:"2%"}} variant="outlined" label="Hash of block" value={block.hash} fullWidth disabled/>
+        <TextField style={{marginBottom:"2%"}} variant="outlined" label="Hash of previous block" value={block.prevHash ? block.prevHash : "No previous block for the genesis block."} fullWidth disabled/>
+        <TextField style={{width:"50%"}} variant="outlined" label="Time of creation (24)" value={moment(block.timestamp).format("DD/MM/YY HH:mm:ss")} fullWidth disabled/>
+        <TextField style={{width:"20%"}} variant="outlined" label="Target" value={block.target ? block.target : "NUL"} fullWidth disabled/>
+        <TextField style={{width:"30%"}} variant="outlined" label="Nonce" value={block.nonce ? block.nonce : "NUL"} fullWidth disabled/>
+        <TextField style={{marginTop:"2%"}} variant="outlined" label="Merkle Root" value={block.merkleRoot ? block.merkleRoot : "There is no transaction."} fullWidth disabled/>
       </div>
-    );
+    )
+  }
+
+  fillTransInfo=(blockAddr, block)=>{
+    if(!block.hasOwnProperty("payload"))
+      return (
+        <div style={{color:"grey", textAlign:"center"}}>There is no transaction.</div>
+      )
+    var payload = JSON.parse(block.payload);
+    var payment = payload.payment;
+    return (
+      <Paper style={{overflowX:"auto"}}>
+        <Table style={{maxWidth:window.innerWidth*0.5+"px"}}>
+          <TableHead>
+            <TableRow>
+              <TableCell>Payer</TableCell>
+              <TableCell>Payee</TableCell>
+              <TableCell>Date time</TableCell>
+              <TableCell numeric>Amount (HKD)</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow key={payment.id}>
+              <TableCell>{payment.payerAddr}</TableCell>
+              <TableCell>{payment.payeeAddr}</TableCell>
+              <TableCell>{payment.timestamp}</TableCell>
+              <TableCell numeric>{payment.amount}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </Paper>
+    )
+  }
+
+  toggleBlockDetails=(blockAddr)=>{
+    this.setState({blockDetails: this.state.blockDetails === blockAddr ? "" : blockAddr});
+  }
+
+  toggleTransDetails=(blockAddr)=>{
+    this.setState({transDetails: this.state.transDetails === blockAddr ? "" : blockAddr});
+  }
+
+  render(){
+    if(this.state.blocks === null || this.state.blocks.length === 0)
+      return <div style={{textAlign:"center", color:"grey", marginTop:"40%"}}>There is no block in the blockchain system.</div>
+    return (
+      <Grid container spacing={8} justify="space-around">
+        {
+          Object.keys(this.state.blocks).map((blockAddr)=>{
+            return (
+              <div>
+                <Grid item key={blockAddr+"_item"}>
+                  {this.genBlockCard(blockAddr, JSON.parse(this.state.blocks[blockAddr]))}
+                </Grid>
+              </div>
+            )
+          })
+        }
+      </Grid>
+    )
   }
 }
 
-PublicLedger.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
+class PublicLedger extends Component {
+  constructor(props){
+    super(props);
+    this.handler = props.handler;
+  }
 
-export default withStyles(styles)(PublicLedger);
+  async componentDidMount(){
+    if(await this.handler.fetchBlocks()){
+      if(this.loader !== null){
+        this.loader.dismiss(<Content ref={(content)=>this.content = content}/>, true);
+        this.content.setBlocks(this.handler.state.blocks);
+      }
+    } else {
+      setTimeout(()=>{
+        this.loader.dismiss(null, false);
+      }, 1500);
+    }
+  }
+
+  componentWillUnMount(){
+
+  }
+
+  render(){
+    return (
+      <div>
+        <Loader ref={(loader)=>this.loader = loader}/>
+      </div>
+    )
+  }
+}
+export default PublicLedger;

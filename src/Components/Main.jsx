@@ -7,6 +7,9 @@ import AppBottomBar from './AppBottomBar';
 
 import Login from './Login';
 
+import Authenticator from './Authenticator';
+import API from './API';
+
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 class Content extends Component {
@@ -37,16 +40,41 @@ class Main extends Component {
   constructor(props){
     super(props);
     this.state = {
-
+      isLoggedIn: false,
+      profile: null,
+      blocks: null
     }
     this.appbar = React.createRef();
+    this.auth = Authenticator.getInstance();
+  }
+
+  async fetchProfile(){
+    if(this.state.profile) return this.state.profile;
+    var cred = await this.auth.isLoggedIn();
+    if(cred){
+      this.setState({credential: cred, isLoggedIn: true});
+      var response = await API.profile();
+      this.setState({profile: response.data});
+      return Promise.resolve(response.data);
+    } else {
+      return Promise.resolve(false);
+    }
+  }
+
+  async fetchBlocks(){
+    if(this.state.blocks) return this.state.blocks;
+    var cred = await this.auth.isLoggedIn();
+    if(cred){
+      this.setState({credential: cred, isLoggedIn: true});
+      var response = await API.blocks();
+      this.setState({blocks: response.data});      
+      return Promise.resolve(response.data);
+    } else {
+      return Promise.resolve(false);
+    }
   }
 
   componentWillMount(){
-
-  }
-
-  componentDidMount(){
 
   }
 
