@@ -94,7 +94,8 @@ class Content extends Component {
     } else return [payerAddr, payeeAddr, amount];
   }
 
-  payment=()=>{
+  payment=(event)=>{
+    event.preventDefault();
     var form = this.validation();
     if(!form) return;
     Swal({
@@ -194,7 +195,7 @@ class Content extends Component {
                     <Button variant="outlined" onClick={this.clearForm}>Clear</Button>
                   </Grid>
                   <Grid item style={{marginLeft:"2%"}}>
-                    <Button style={{color:red[500]}} variant="outlined" onClick={this.payment}>Pay</Button>
+                    <Button type="submit" style={{color:red[500]}} variant="outlined" onClick={this.payment}>Pay</Button>
                   </Grid>
                   </Grid>
                 </Grid>
@@ -227,14 +228,20 @@ class Payment extends Component {
   }
 
   async componentDidMount(){
-    if(await this.handler.fetchProfile()){
-      if(this.loader !== null){
-        this.loader.dismiss(<Content ref={(content)=>this.content = content}/>, true);
-        this.content.setWalletAddr(this.handler.state.profile.walletAddr);
+    try {
+      if(await this.handler.fetchProfile()){
+        if(this.loader !== null){
+          this.loader.dismiss(<Content ref={(content)=>this.content = content}/>, true);
+          this.content.setWalletAddr(this.handler.state.profile.walletAddr);
+        }
+      } else {
+        setTimeout(()=>{
+          this.loader.dismiss(null, false);
+        }, 1500);
       }
-    } else {
+    } catch(err) {
       setTimeout(()=>{
-        this.loader.dismiss(null, false);
+        this.loader.dismiss(null, false, true);
       }, 1500);
     }
   }

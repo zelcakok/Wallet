@@ -11,6 +11,7 @@ class Loader extends Component {
     this.state = {
       showLoader: true,
       isLoggedIn: false,
+      isError: false,
       content: null
     }
   }
@@ -27,8 +28,8 @@ class Loader extends Component {
 
   }
 
-  dismiss=(content, isLoggedIn)=>{
-    this.setState({showLoader: false, content: content, isLoggedIn: isLoggedIn})
+  dismiss=(content, isLoggedIn, isError = false)=>{
+    this.setState({showLoader: false, content: content, isLoggedIn: isLoggedIn, isError: isError})
   }
 
   render(){
@@ -38,7 +39,14 @@ class Loader extends Component {
           <CircularProgress style={{color:red[500]}}/>
         </div>
       )
-    } else if(this.state.isLoggedIn) return this.state.content;
+    }
+    else if(this.state.isLoggedIn) return this.state.content;
+    else if(this.state.isError) return (
+      <div style={{textAlign:"center", marginTop:"10%"}}>
+        <div style={{color:"grey"}}>Opps...cannot connect to the Wallet client.</div>
+        <Button style={{marginTop:"5%", color:red[500]}} variant="outlined" onClick={()=>window.location.reload()}>Refresh webpage</Button>
+      </div>
+    )
     return (
       <div style={{textAlign:"center", marginTop:"10%"}}>
         <div style={{color:"grey"}}>Please login to the Wallet system first.</div>

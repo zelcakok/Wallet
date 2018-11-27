@@ -45,16 +45,22 @@ class Main extends Component {
       isLoggedIn: false,
       profile: null,
       blocks: null,
+      mining: null,
       addressBook: null,
-      walletBankWalletAddr: ""
+      walletBankWalletAddr: "",
+      updateUnSeen: null
     }
     this.appbar = React.createRef();
     this.auth = Authenticator.getInstance();
     this.eventEmitter = new EventEmitter();
   }
 
-  async fetchProfile(){
-    if(this.state.profile) return this.state.profile;
+  setUpdateUnSeen=(func)=>{
+    this.setState({updateUnSeen: func});
+  }
+
+  async fetchProfile(forceUpdate = false){
+    if(!forceUpdate && this.state.profile) return this.state.profile;
     var cred = await this.auth.isLoggedIn();
     if(cred){
       this.setState({credential: cred, isLoggedIn: true});
@@ -66,8 +72,8 @@ class Main extends Component {
     }
   }
 
-  async fetchBlocks(){
-    if(this.state.blocks) return this.state.blocks;
+  async fetchBlocks(forceUpdate = false){
+    if(!forceUpdate && this.state.blocks) return this.state.blocks;
     var cred = await this.auth.isLoggedIn();
     if(cred){
       this.setState({credential: cred, isLoggedIn: true});
@@ -76,6 +82,19 @@ class Main extends Component {
         this.getWalletBankWalletAddr();
       });
       return Promise.resolve(response.data);
+    } else {
+      return Promise.resolve(false);
+    }
+  }
+
+  async fetchMining(forceUpdate = false){
+    if(!forceUpdate && this.state.mining) return this.state.mining;
+    var cred = await this.auth.isLoggedIn();
+    if(cred){
+      this.setState({credential: cred, isLoggedIn: true});
+      var response = await API.mining();
+      this.setState({mining: response.data.message});
+      return Promise.resolve(response.data.message);
     } else {
       return Promise.resolve(false);
     }
@@ -94,9 +113,14 @@ class Main extends Component {
 
   fetchData=()=>{
     (async ()=>{
-      await this.fetchProfile();
-      await this.fetchBlocks();
-      this.eventEmitter.emit("onDataUpdated");
+      try {
+        await this.fetchProfile(true);
+        await this.fetchBlocks(true);
+        await this.fetchMining(true);
+        this.eventEmitter.emit("onDataUpdated");
+      } catch(err) {
+
+      }
     })();
   }
 
@@ -105,7 +129,7 @@ class Main extends Component {
       await this.fetchData();
       setInterval(async ()=>{
         await this.fetchData();
-      }, 1000 * 5);
+      }, 1000 * 1);
     })();
   }
 

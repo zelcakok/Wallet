@@ -18,7 +18,14 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import TableFooter from '@material-ui/core/TableFooter';
+import TablePagination from '@material-ui/core/TablePagination';
 import Paper from '@material-ui/core/Paper';
+import IconButton from '@material-ui/core/IconButton';
+import FirstPageIcon from '@material-ui/icons/FirstPage';
+import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
+import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
+import LastPageIcon from '@material-ui/icons/LastPage';
 
 import MoneyIcon from '@material-ui/icons/AttachMoney';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -45,7 +52,7 @@ class Content extends Component {
       ledger: [],
       lastUpdate: "",
       transferAmount: "",
-      walletBankWalletAddr: ""
+      walletBankWalletAddr: "",
     }
     this.auth = Authenticator.getInstance();
   }
@@ -71,7 +78,7 @@ class Content extends Component {
   }
 
   setLedger=(ledger)=>{
-    var records = this.state.ledger;
+    var records = [];
     var paymentIDs = Object.keys(ledger);
     for(var i=paymentIDs.length-1; i>=0; i--){
       var row = null;
@@ -110,7 +117,8 @@ class Content extends Component {
     } else return true;
   }
 
-  transfer=()=>{
+  transfer=(event)=>{
+    event.preventDefault();
     if(!this.validation()) return;
     Swal({
       title: 'Verification',
@@ -169,7 +177,7 @@ class Content extends Component {
                 <MoneyIcon/>
               </Avatar>
             }
-            title="Balance" subheader={"Last update: " + this.state.lastUpdate}/>
+            title="Balance" subheader={"The last 30 records will be shown here."}/>
           <CardContent style={{textAlign:"center"}}>
             <Grid container direction="row" justify="space-between">
               <Grid item>
@@ -255,7 +263,7 @@ class Content extends Component {
                     <Button variant="outlined" onClick={this.clearForm}>Clear</Button>
                   </Grid>
                   <Grid item style={{marginLeft:"2%"}}>
-                    <Button style={{color:red[500]}} variant="outlined" onClick={this.transfer}>Transfer</Button>
+                    <Button type="submit" style={{color:red[500]}} variant="outlined" onClick={this.transfer}>Transfer</Button>
                   </Grid>
                   </Grid>
                 </Grid>
@@ -272,7 +280,7 @@ class Balance extends Component {
   constructor(props){
     super(props);
     this.handler = props.handler;
-    // this.handler.eventEmitter.on("onDataUpdated", this.invalidate);
+    this.handler.eventEmitter.on("onDataUpdated", ()=>this.invalidate());
   }
 
   invalidate=()=>{
@@ -283,16 +291,22 @@ class Balance extends Component {
   }
 
   async componentDidMount(){
-    if(await this.handler.fetchProfile()){
-      if(this.loader !== null){
-        this.loader.dismiss(<Content ref={(content)=>this.content = content}/>, true);
-        this.content.setWalletAddr(this.handler.state.profile.walletAddr);
-        this.content.getWalletBankWalletAddr = this.handler.getWalletBankWalletAddr;
-        this.invalidate();
+    try {
+      if(await this.handler.fetchProfile()){
+        if(this.loader !== null){
+          this.loader.dismiss(<Content ref={(content)=>this.content = content}/>, true);
+          this.content.setWalletAddr(this.handler.state.profile.walletAddr);
+          this.content.getWalletBankWalletAddr = this.handler.getWalletBankWalletAddr;
+          this.invalidate();
+        }
+      } else {
+        setTimeout(()=>{
+          this.loader.dismiss(null, false);
+        }, 1500);
       }
-    } else {
+    } catch(err) {
       setTimeout(()=>{
-        this.loader.dismiss(null, false);
+        this.loader.dismiss(null, false, true);
       }, 1500);
     }
   }

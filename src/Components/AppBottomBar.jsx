@@ -6,6 +6,8 @@ import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
 import AccountBalanceWalletIcon from '@material-ui/icons/AccountBalanceWallet';
 import PaymentIcon from '@material-ui/icons/Payment';
 import ChromeReaderModeIcon from '@material-ui/icons/ChromeReaderMode';
+import MinersIcon from '@material-ui/icons/Adb';
+import Badge from '@material-ui/core/Badge';
 
 import Divider from '@material-ui/core/Divider';
 import Frame from './Frame';
@@ -19,7 +21,7 @@ class AppBottomBar extends Component {
     super(props);
     this.state = {
       selectedTab : 0,
-      isLoggedIn: false
+      isLoggedIn: false,
     }
     this.handler = props.handler;
   }
@@ -34,6 +36,7 @@ class AppBottomBar extends Component {
   }
 
   componentDidMount(){
+    this.handler.handler.setUpdateUnSeen(this.updateUnSeen);
     this.setState({selectedTab: this.handler.frameLayout.current.getFragmentID()})
   }
 
@@ -50,9 +53,10 @@ class AppBottomBar extends Component {
           onChange={this.handleChange}
           showLabels
         >
-          <BottomNavigationAction style={{color: this.state.selectedTab===0?red[500]:''}} label="Balance" icon={<AccountBalanceWalletIcon />}/>
-          <BottomNavigationAction style={{color: this.state.selectedTab===1?red[500]:''}} label="Payment" icon={<PaymentIcon />} />
+          <BottomNavigationAction style={{color: this.state.selectedTab===0?red[500]:''}} label="Balance" icon={<AccountBalanceWalletIcon/>}/>
+          <BottomNavigationAction style={{color: this.state.selectedTab===1?red[500]:''}} label="Payment" icon={<PaymentIcon/>}/>
           <BottomNavigationAction style={{color: this.state.selectedTab===2?red[500]:''}} label="Public Ledger" icon={<ChromeReaderModeIcon />} />
+          <BottomNavigationAction style={{color: this.state.selectedTab===3?red[500]:''}} label="Miners" icon={<MinersIcon />} />
         </BottomNavigation>
       </div>
     )

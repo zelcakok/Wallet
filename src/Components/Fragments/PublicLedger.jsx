@@ -220,9 +220,9 @@ class Content extends Component {
 
   render(){
     if(this.state.blocks === null || this.state.blocks.length === 0)
-      return <div style={{textAlign:"center", color:"grey", marginTop:"40%"}}>There is no block in the blockchain system.</div>
+      return <div style={{textAlign:"center", color:"grey", marginTop:"10%"}}>There is no block on the blockchain system.</div>
     return (
-      <Grid container spacing={8} justify="space-around">
+      <Grid container spacing={8} justify="flex-start">
         {
           (this.state.sortedBlockKeys).map((blockAddr)=>{
             return (
@@ -252,15 +252,21 @@ class PublicLedger extends Component {
   }
 
   async componentDidMount(){
-    if(await this.handler.fetchBlocks()){
-      if(this.loader !== null){
-        this.loader.dismiss(<Content ref={(content)=>this.content = content}/>, true);
-        this.content.setAddressBook(this.handler.state.addressBook);
-        this.invalidate();
+    try {
+      if(await this.handler.fetchBlocks()){
+        if(this.loader !== null){
+          this.loader.dismiss(<Content ref={(content)=>this.content = content}/>, true);
+          this.content.setAddressBook(this.handler.state.addressBook);
+          this.invalidate();
+        }
+      } else {
+        setTimeout(()=>{
+          this.loader.dismiss(null, false);
+        }, 1500);
       }
-    } else {
+    } catch(err) {
       setTimeout(()=>{
-        this.loader.dismiss(null, false);
+        this.loader.dismiss(null, false, true);
       }, 1500);
     }
   }

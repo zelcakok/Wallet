@@ -15,6 +15,11 @@ class API {
     return axios.get(url, { httpsAgent: API.REQUEST_AGENT });
   }
 
+  static async mining(){
+    var url = API.getIPAddress()+"/mining";
+    return axios.get(url, { httpsAgent: API.REQUEST_AGENT });
+  }
+
   static async verify(digest){
     var url = API.getIPAddress()+"/verify?digest="+digest;
     return axios.get(url, { httpsAgent: API.REQUEST_AGENT });
@@ -25,7 +30,6 @@ class API {
     query += "&payerAddr="+params.payerAddr;
     query += "&payeeAddr="+params.payeeAddr;
     query += "&amount="+params.amount;
-    console.log("SENT:", query);
     var url = API.getIPAddress()+"/transfer?"+query;
     return axios.get(url, { httpsAgent: API.REQUEST_AGENT });
   }
