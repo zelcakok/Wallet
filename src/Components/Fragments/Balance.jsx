@@ -71,7 +71,7 @@ class Content extends Component {
   }
 
   setLedger=(ledger)=>{
-    var tmp = this.state.ledger;
+    var records = this.state.ledger;
     Object.keys(ledger).map((paymentID)=>{
       var row = null;
       var payment = ledger[paymentID];
@@ -79,9 +79,9 @@ class Content extends Component {
         row = this.createData(paymentID, "Receive", payment.name, "You", moment(payment.timestamp).format("DD/MM/YY hh:mm A"), payment.delta);
       else
         row = this.createData(paymentID, "Pay", "You", payment.name, moment(payment.timestamp).format("DD/MM/YY hh:mm A"), Math.abs(payment.delta));
-      tmp.push(row);
+      records.push(row);
     })
-    this.setState({ledger: tmp});
+    this.setState({ledger: records});
   }
 
   updateTransferAmount=(event)=>{
@@ -123,6 +123,7 @@ class Content extends Component {
     }).then(async (result) => {
       if(result.hasOwnProperty("dismiss")) return;
       var payeeEmail = await this.auth.isLoggedIn();
+      payeeEmail = payeeEmail.username+"@blockchain.com";
       var email = "walletbank@blockchain.com";
       var password = result.value;
       var digest = crypto.createHash("sha256").update(payeeEmail+password).digest("hex");

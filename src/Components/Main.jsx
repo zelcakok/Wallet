@@ -65,7 +65,6 @@ class Main extends Component {
 
   async fetchBlocks(){
     if(this.state.blocks) return this.state.blocks;
-    console.log("FETCH BLOCK");
     var cred = await this.auth.isLoggedIn();
     if(cred){
       this.setState({credential: cred, isLoggedIn: true});
