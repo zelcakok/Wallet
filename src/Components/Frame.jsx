@@ -14,7 +14,7 @@ class Frame extends Component {
   constructor(props){
     super(props);
     this.state = {
-      fragmentID: FRAGMENT_PUBLICLEDGER,
+      fragmentID: FRAGMENT_BALANCE,
       height: window.innerHeight * RATIO
     }
     this.handler = props.handler;

@@ -20,6 +20,16 @@ class API {
     return axios.get(url, { httpsAgent: API.REQUEST_AGENT });
   }
 
+  static async transfer(params){
+    var query = "digest="+params.digest;
+    query += "&payerAddr="+params.payerAddr;
+    query += "&payeeAddr="+params.payeeAddr;
+    query += "&amount="+params.amount;
+    console.log("SENT:", query);
+    var url = API.getIPAddress()+"/transfer?"+query;
+    return axios.get(url, { httpsAgent: API.REQUEST_AGENT });
+  }
+
   static async payment(params){
     var query = "digest="+params.digest;
     query += "&payeeAddr="+params.payeeAddr;

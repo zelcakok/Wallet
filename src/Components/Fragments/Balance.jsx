@@ -25,6 +25,8 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import AtmIcon from '@material-ui/icons/Atm';
 
+import crypto from 'crypto';
+import Swal from 'sweetalert2';
 import moment from 'moment';
 
 //Colors
@@ -42,9 +44,10 @@ class Content extends Component {
       availBalance: 0,
       ledger: [],
       lastUpdate: "",
-      creditCardAddr: "",
-      creditCardInputAmount: ""
+      transferAmount: "",
+      walletBankWalletAddr: ""
     }
+    this.auth = Authenticator.getInstance();
   }
 
   createData=(id, type, payer, payee, datetime, amount)=>{
@@ -53,6 +56,10 @@ class Content extends Component {
 
   setLastUpdate=(timestamp)=>{
     this.setState({lastUpdate: moment(timestamp).format("DD/MM/YY hh:mm:ss A")})
+  }
+
+  setWalletBankWalletAddr=(walletAddr)=>{
+    this.setState({walletBankWalletAddr: walletAddr});
   }
 
   setWalletAddr=(walletAddr)=>{
@@ -75,6 +82,79 @@ class Content extends Component {
       tmp.push(row);
     })
     this.setState({ledger: tmp});
+  }
+
+  updateTransferAmount=(event)=>{
+    this.setState({transferAmount: event.target.value});
+  }
+
+  clearForm=()=>{
+    this.setState({transferAmount: ""});
+  }
+
+  validation=()=>{
+    var valid = {status: true, message: ""};
+    var amount = this.state.transferAmount;
+
+    if(amount === "" || amount < 0) { valid.status = false; valid.message = "Please specify a valid amount.";}
+
+    if(!valid.status){
+      Swal({
+        title: 'Transfer Error',
+        text: valid.message,
+        type: 'error',
+        showCancelButton: false,
+        confirmButtonText: 'Dismiss',
+      }).then(()=>{return false})
+    } else return true;
+  }
+
+  transfer=()=>{
+    if(!this.validation()) return;
+    Swal({
+      title: 'Verification',
+      text: 'The transaction will be settled in 10 minutes.',
+      input: 'password',
+      inputPlaceholder: 'Please enter your password here.',
+      type: 'info',
+      showCancelButton: true,
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'Cancel'
+    }).then(async (result) => {
+      if(result.hasOwnProperty("dismiss")) return;
+      var payeeEmail = await this.auth.isLoggedIn();
+      var email = "walletbank@blockchain.com";
+      var password = result.value;
+      var digest = crypto.createHash("sha256").update(payeeEmail+password).digest("hex");
+      var payerAddr = this.getWalletBankWalletAddr();
+      var payeeAddr = this.state.walletAddr;
+      var amount = this.state.transferAmount;
+      API.transfer({
+        digest: digest,
+        payerAddr: payerAddr,
+        payeeAddr: payeeAddr,
+        amount: amount
+      }).then((response)=>{
+        if(!response.data.status) {
+          Swal({
+            title: 'Transfer Error',
+            text: response.data.message,
+            type: 'error',
+            showCancelButton: false,
+            confirmButtonText: 'Dismiss',
+          })
+        }
+        else {
+          Swal({
+            title: 'Transfer created successfully',
+            text: 'The transaction will be settled in 10 minutes.',
+            type: 'info',
+            showCancelButton: false,
+            confirmButtonText: 'Dismiss',
+          }).then(()=>this.clearForm())
+        }
+      })
+    })
   }
 
   render(){
@@ -156,8 +236,8 @@ class Content extends Component {
             <form noValidate autoComplete="off">
               <TextField id="amount" label="Amount"
                          placeholder="HKD 0.00" fullWidth
-                         onChange={this.updatePaymentAmount}
-                         value={this.state.paymentAmount} type="number"
+                         onChange={this.updateTransferAmount}
+                         value={this.state.transferAmount} type="number"
                          InputLabelProps={{ shrink: true, min: 0, step: 1 }}
                          margin="normal" variant="outlined"/>
               <Divider style={{marginTop:"1%", marginBottom:"2%"}}/>
@@ -173,7 +253,7 @@ class Content extends Component {
                     <Button variant="outlined" onClick={this.clearForm}>Clear</Button>
                   </Grid>
                   <Grid item style={{marginLeft:"2%"}}>
-                    <Button style={{color:red[500]}} variant="outlined" onClick={this.payment}>Transfer</Button>
+                    <Button style={{color:red[500]}} variant="outlined" onClick={this.transfer}>Transfer</Button>
                   </Grid>
                   </Grid>
                 </Grid>
@@ -199,6 +279,8 @@ class Balance extends Component {
         this.content.setLastUpdate(this.handler.state.profile.ledger.lastUpdate);
         this.content.setAvailBalance(this.handler.state.profile.ledger.balance);
         this.content.setLedger(this.handler.state.profile.ledger.ledger);
+        this.content.setWalletAddr(this.handler.state.profile.walletAddr);
+        this.content.getWalletBankWalletAddr = this.handler.getWalletBankWalletAddr;
       }
     } else {
       setTimeout(()=>{

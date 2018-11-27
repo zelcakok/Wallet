@@ -43,7 +43,8 @@ class Main extends Component {
       isLoggedIn: false,
       profile: null,
       blocks: null,
-      addressBook: null
+      addressBook: null,
+      walletBankWalletAddr: ""
     }
     this.appbar = React.createRef();
     this.auth = Authenticator.getInstance();
@@ -64,19 +65,34 @@ class Main extends Component {
 
   async fetchBlocks(){
     if(this.state.blocks) return this.state.blocks;
+    console.log("FETCH BLOCK");
     var cred = await this.auth.isLoggedIn();
     if(cred){
       this.setState({credential: cred, isLoggedIn: true});
       var response = await API.blocks();
-      this.setState({blocks: response.data.blocks, addressBook: response.data.addressBook});
+      this.setState({blocks: response.data.blocks, addressBook: response.data.addressBook}, ()=>{
+        this.getWalletBankWalletAddr();
+      });
       return Promise.resolve(response.data);
     } else {
       return Promise.resolve(false);
     }
   }
 
-  componentWillMount(){
+  getWalletBankWalletAddr=()=>{
+    if(this.state.walletBankWalletAddr !== "") return this.state.walletBankWalletAddr;
+    var walletAddr = Object.keys(this.state.addressBook);
+    for(var i in walletAddr)
+      if(this.state.addressBook[walletAddr[i]].email === "walletbank@blockchain.com") {
+        this.setState({walletBankWalletAddr: walletAddr[i]});
+        return walletAddr[i];
+      }
+    return false;
+  }
 
+  async componentWillMount(){
+    await this.fetchProfile();
+    await this.fetchBlocks();
   }
 
   componentWillUnMount(){

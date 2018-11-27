@@ -120,10 +120,10 @@ class Content extends Component {
         payeeAddr: payeeAddr,
         amount: amount
       }).then((response)=>{
-        if(!response.status) {
+        if(!response.data.status) {
           Swal({
             title: 'Payment Error',
-            text: response.message,
+            text: response.data.message,
             type: 'error',
             showCancelButton: false,
             confirmButtonText: 'Dismiss',
@@ -136,7 +136,7 @@ class Content extends Component {
             type: 'info',
             showCancelButton: false,
             confirmButtonText: 'Dismiss',
-          })
+          }).then(()=>this.clearForm())
         }
       })
     })

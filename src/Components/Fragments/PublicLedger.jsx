@@ -191,8 +191,8 @@ class Content extends Component {
             <TableRow key={payment.id}>
               <TableCell>{this.state.addressBook[payment.payerAddr].email.split("@")[0]}</TableCell>
               <TableCell>{this.state.addressBook[payment.payeeAddr].email.split("@")[0]}</TableCell>
-              <TableCell>{payment.timestamp}</TableCell>
-              <TableCell numeric>{payment.amount}</TableCell>
+              <TableCell>{moment(payment.timestamp).format("DD/MM/YY hh:mm:ss A")}</TableCell>
+              <TableCell numeric>{parseFloat(payment.amount).toFixed(2)}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
