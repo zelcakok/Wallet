@@ -50,8 +50,18 @@ class Content extends Component {
     this.state = {
       blockDetails: "",
       transDetails: "",
-      blocks: null
+      blocks: null,
+      sortedBlockKeys: null,
+      addressBook: null
     }
+  }
+
+  setAddressBook=(addressBook)=>{
+    this.setState({addressBook: addressBook});
+  }
+
+  setSortedBlockKeys=(keys)=>{
+    this.setState({sortedBlockKeys: keys});
   }
 
   setBlocks=(blocks)=>{
@@ -74,7 +84,7 @@ class Content extends Component {
           }
           title={
             <Grid container justify="flex-start">
-              <Grid item style={{marginRight:"2%"}}>
+              <Grid item xs={2}>
                 <div>Block address</div>
               </Grid>
               <Grid item>
@@ -85,7 +95,7 @@ class Content extends Component {
           subheader={
             <div>
               <Grid container justify="flex-start">
-                <Grid item style={{marginRight:"4.1%"}}>
+                <Grid item xs={2}>
                   <div>Block hash</div>
                 </Grid>
                 <Grid item>
@@ -93,7 +103,7 @@ class Content extends Component {
                 </Grid>
               </Grid>
               <Grid container justify="flex-start">
-                <Grid item style={{marginRight:"1.8%"}}>
+                <Grid item xs={2}>
                   <div>Previous hash</div>
                 </Grid>
                 <Grid item>
@@ -179,8 +189,8 @@ class Content extends Component {
           </TableHead>
           <TableBody>
             <TableRow key={payment.id}>
-              <TableCell>{payment.payerAddr}</TableCell>
-              <TableCell>{payment.payeeAddr}</TableCell>
+              <TableCell>{this.state.addressBook[payment.payerAddr].email.split("@")[0]}</TableCell>
+              <TableCell>{this.state.addressBook[payment.payeeAddr].email.split("@")[0]}</TableCell>
               <TableCell>{payment.timestamp}</TableCell>
               <TableCell numeric>{payment.amount}</TableCell>
             </TableRow>
@@ -204,13 +214,11 @@ class Content extends Component {
     return (
       <Grid container spacing={8} justify="space-around">
         {
-          Object.keys(this.state.blocks).map((blockAddr)=>{
+          (this.state.sortedBlockKeys).map((blockAddr)=>{
             return (
-              <div>
-                <Grid item key={blockAddr+"_item"}>
-                  {this.genBlockCard(blockAddr, JSON.parse(this.state.blocks[blockAddr]))}
-                </Grid>
-              </div>
+              <Grid item key={blockAddr+"_item"}>
+                {this.genBlockCard(blockAddr, JSON.parse(this.state.blocks[blockAddr]))}
+              </Grid>
             )
           })
         }
@@ -229,7 +237,11 @@ class PublicLedger extends Component {
     if(await this.handler.fetchBlocks()){
       if(this.loader !== null){
         this.loader.dismiss(<Content ref={(content)=>this.content = content}/>, true);
+
+        var sortedBlockKeys = Object.keys(this.handler.state.blocks).sort((a, b)=>{return b - a;})
+        this.content.setSortedBlockKeys(sortedBlockKeys);
         this.content.setBlocks(this.handler.state.blocks);
+        this.content.setAddressBook(this.handler.state.addressBook);
       }
     } else {
       setTimeout(()=>{

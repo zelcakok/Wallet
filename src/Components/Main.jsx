@@ -42,7 +42,8 @@ class Main extends Component {
     this.state = {
       isLoggedIn: false,
       profile: null,
-      blocks: null
+      blocks: null,
+      addressBook: null
     }
     this.appbar = React.createRef();
     this.auth = Authenticator.getInstance();
@@ -67,7 +68,7 @@ class Main extends Component {
     if(cred){
       this.setState({credential: cred, isLoggedIn: true});
       var response = await API.blocks();
-      this.setState({blocks: response.data});      
+      this.setState({blocks: response.data.blocks, addressBook: response.data.addressBook});
       return Promise.resolve(response.data);
     } else {
       return Promise.resolve(false);

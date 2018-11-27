@@ -69,9 +69,9 @@ class Content extends Component {
       var row = null;
       var payment = ledger[paymentID];
       if(payment.delta > 0)
-        row = this.createData(paymentID, "Receive", payment.target, "You", moment(payment.timestamp).format("DD/MM/YY hh:mm A"), payment.delta);
+        row = this.createData(paymentID, "Receive", payment.name, "You", moment(payment.timestamp).format("DD/MM/YY hh:mm A"), payment.delta);
       else
-        row = this.createData(paymentID, "Pay", "You", payment.target, moment(payment.timestamp).format("DD/MM/YY hh:mm A"), Math.abs(payment.delta));
+        row = this.createData(paymentID, "Pay", "You", payment.name, moment(payment.timestamp).format("DD/MM/YY hh:mm A"), Math.abs(payment.delta));
       tmp.push(row);
     })
     this.setState({ledger: tmp});
@@ -79,7 +79,7 @@ class Content extends Component {
 
   render(){
     return (
-      <div>
+      <div style={{maxWidth: 1200, float:"none", margin:"auto"}}>
         <Card style={{marginBottom:"2%"}}>
           <CardHeader
             avatar = {
@@ -154,37 +154,13 @@ class Content extends Component {
             title="Top Up Balance" subheader="Transfer money to your wallet."/>
           <CardContent style={{textAlign:"center"}}>
             <form noValidate autoComplete="off">
-              <Grid
-                container
-                direction="row"
-                justify="flex-end"
-                alignItems="center"
-              >
-                <Grid item xs={8}>
-                  <TextField id="payeeAddr" placeholder="Type the credit card number here." fullWidth
-                             label="Credit card number" fullWidth
-                             value={this.state.creditCardAddr} required
-                             onChange={this.updateCreditCardAddr}
-                             margin="normal" variant="outlined"/>
-                </Grid>
-                <Grid item xs={4}>
-                  <TextField id="amount" label="Security Code"
-                             placeholder="000 / 0000" fullWidth
-                             onChange={this.updateCreditCardInputAmount}
-                             value={this.state.creditCardInputAmount} type="number"
-                             InputLabelProps={{ shrink: true, min: 0, step: 0 }}
-                             margin="normal" variant="outlined"/>
-                </Grid>
-              </Grid>
               <TextField id="amount" label="Amount"
                          placeholder="HKD 0.00" fullWidth
                          onChange={this.updatePaymentAmount}
                          value={this.state.paymentAmount} type="number"
                          InputLabelProps={{ shrink: true, min: 0, step: 1 }}
                          margin="normal" variant="outlined"/>
-
-              <Divider style={{marginTop:"5%", marginBottom:"2%"}}/>
-
+              <Divider style={{marginTop:"1%", marginBottom:"2%"}}/>
               <Grid container direction="row">
                 <Grid item xs>
                   <Grid

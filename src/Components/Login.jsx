@@ -38,18 +38,16 @@ class Login extends Component {
     this.setState({password: event.target.value});
   }
 
-  login=()=>{
-    Swal({
-      title: 'Please wait....',
-      showCancelButton: false,
-      onOpen: ()=>{
-        Swal.showLoading()
-      }
-    })
+  login=(event)=>{
+    event.preventDefault()
     var email = this.state.email;
     var password = this.state.password;
     var digest = crypto.createHash("sha256").update(email+password).digest("hex");
     API.verify(digest).then((result)=>{
+      Swal({
+        title: 'Please wait....',
+        showCancelButton: false,
+      })
       if(result.data === true){
         this.emailAuth(email, password).then((cred)=>{
           window.location = "/";
@@ -84,38 +82,40 @@ class Login extends Component {
 
   render(){
     return (
-      <div style={{float:"none", margin:"auto", width:window.innerWidth * 0.9, marginTop:"10%"}}>
+      <div style={{float:"none", margin:"auto", maxWidth:600,width:window.innerWidth * 0.9, marginTop:"10%"}}>
         <Card>
           <CardHeader
             avatar={
-              <Avatar>
+              <Avatar style={{backgroundColor:red[500]}}>
                 <KeyIcon/>
               </Avatar>
             }
             title="Login"
             subheader="Welcome to Wallet"/>
           <CardContent>
-            <TextField id="email" placeholder="Please enter the email address here." fullWidth
-                       label="Email address of your Wallet" required
-                       type="email"
-                       value={this.state.email}
-                       onChange={this.updateEmail}
-                       margin="normal" variant="outlined"/>
-            <TextField id="password" placeholder="Please enter the password here." fullWidth
-                       label="Password of your Wallet" required
-                       type="password"
-                       value={this.state.password}
-                       onChange={this.updatePassword}
-                       margin="normal" variant="outlined"/>
-             <Divider style={{marginTop:"5%", marginBottom:"2%"}}/>
-             <Grid container direction="row" justify="flex-end">
-               <Grid item>
-                 <Button variant="outlined" onClick={this.backToHome}>Cancel</Button>
+            <form>
+              <TextField id="email" placeholder="Please enter the email address here." fullWidth
+                         label="Email address of your Wallet" required
+                         type="email"
+                         value={this.state.email}
+                         onChange={this.updateEmail}
+                         margin="normal" variant="outlined"/>
+              <TextField id="password" placeholder="Please enter the password here." fullWidth
+                         label="Password of your Wallet" required
+                         type="password"
+                         value={this.state.password}
+                         onChange={this.updatePassword}
+                         margin="normal" variant="outlined"/>
+               <Divider style={{marginTop:"5%", marginBottom:"2%"}}/>
+               <Grid container direction="row" justify="flex-end">
+                 <Grid item>
+                   <Button variant="outlined" onClick={this.backToHome}>Cancel</Button>
+                 </Grid>
+                 <Grid item>
+                   <Button type="submit" variant="outlined" style={{color:red[500], marginLeft:"10%"}} onClick={this.login}>Login</Button>
+                 </Grid>
                </Grid>
-               <Grid item>
-                 <Button variant="outlined" style={{color:red[500], marginLeft:"10%"}} onClick={this.login}>Login</Button>
-               </Grid>
-             </Grid>
+             </form>
           </CardContent>
         </Card>
       </div>

@@ -144,7 +144,7 @@ class Content extends Component {
 
   render(){
     return (
-      <div>
+      <div style={{maxWidth: 1200, float:"none", margin:"auto"}}>
         <Card style={{marginBottom:"2%"}}>
           <CardHeader
             avatar = {
@@ -168,6 +168,7 @@ class Content extends Component {
                          label="Payee wallet address"
                          value={this.state.payeeAddr} required
                          onChange={this.updatePayeeAddr}
+                         InputLabelProps={{ shrink: true }}
                          margin="normal" variant="outlined"/>
               <TextField id="amount" label="Amount"
                          placeholder="HKD 0.00" fullWidth
