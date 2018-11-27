@@ -288,6 +288,7 @@ class Balance extends Component {
         this.loader.dismiss(<Content ref={(content)=>this.content = content}/>, true);
         this.content.setWalletAddr(this.handler.state.profile.walletAddr);
         this.content.getWalletBankWalletAddr = this.handler.getWalletBankWalletAddr;
+        this.invalidate();
       }
     } else {
       setTimeout(()=>{

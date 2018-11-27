@@ -256,6 +256,7 @@ class PublicLedger extends Component {
       if(this.loader !== null){
         this.loader.dismiss(<Content ref={(content)=>this.content = content}/>, true);
         this.content.setAddressBook(this.handler.state.addressBook);
+        this.invalidate();
       }
     } else {
       setTimeout(()=>{
