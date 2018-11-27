@@ -272,7 +272,7 @@ class Balance extends Component {
   constructor(props){
     super(props);
     this.handler = props.handler;
-    this.handler.eventEmitter.on("onDataUpdated", this.invalidate);
+    // this.handler.eventEmitter.on("onDataUpdated", this.invalidate);
   }
 
   invalidate=()=>{
