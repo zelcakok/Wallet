@@ -10,6 +10,8 @@ import Login from './Login';
 import Authenticator from './Authenticator';
 import API from './API';
 
+import EventEmitter from 'events';
+
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 class Content extends Component {
@@ -48,6 +50,7 @@ class Main extends Component {
     }
     this.appbar = React.createRef();
     this.auth = Authenticator.getInstance();
+    this.eventEmitter = new EventEmitter();
   }
 
   async fetchProfile(){
@@ -89,9 +92,25 @@ class Main extends Component {
     return false;
   }
 
+  fetchData=()=>{
+    (async ()=>{
+      await this.fetchProfile();
+      await this.fetchBlocks();
+      this.eventEmitter.emit("onDataUpdated");
+    })();
+  }
+
+  fetchDataService=()=>{
+    (async ()=>{
+      await this.fetchData();
+      setInterval(async ()=>{
+        await this.fetchData();
+      }, 1000 * 5);
+    })();
+  }
+
   async componentWillMount(){
-    await this.fetchProfile();
-    await this.fetchBlocks();
+    this.fetchDataService();
   }
 
   componentWillUnMount(){

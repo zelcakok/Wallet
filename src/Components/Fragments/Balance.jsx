@@ -272,15 +272,20 @@ class Balance extends Component {
   constructor(props){
     super(props);
     this.handler = props.handler;
+    this.handler.eventEmitter.on("onDataUpdated", this.invalidate);
+  }
+
+  invalidate=()=>{
+    if(this.content === null) return;
+    this.content.setLastUpdate(this.handler.state.profile.ledger.lastUpdate);
+    this.content.setAvailBalance(this.handler.state.profile.ledger.balance);
+    this.content.setLedger(this.handler.state.profile.ledger.ledger);
   }
 
   async componentDidMount(){
     if(await this.handler.fetchProfile()){
       if(this.loader !== null){
         this.loader.dismiss(<Content ref={(content)=>this.content = content}/>, true);
-        this.content.setLastUpdate(this.handler.state.profile.ledger.lastUpdate);
-        this.content.setAvailBalance(this.handler.state.profile.ledger.balance);
-        this.content.setLedger(this.handler.state.profile.ledger.ledger);
         this.content.setWalletAddr(this.handler.state.profile.walletAddr);
         this.content.getWalletBankWalletAddr = this.handler.getWalletBankWalletAddr;
       }

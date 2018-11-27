@@ -241,16 +241,20 @@ class PublicLedger extends Component {
   constructor(props){
     super(props);
     this.handler = props.handler;
+    this.handler.eventEmitter.on("onDataUpdated", this.invalidate);
+  }
+
+  invalidate=()=>{
+    if(this.content === null) return;
+    var sortedBlockKeys = Object.keys(this.handler.state.blocks).sort((a, b)=>{return b - a;})
+    this.content.setSortedBlockKeys(sortedBlockKeys);
+    this.content.setBlocks(this.handler.state.blocks);
   }
 
   async componentDidMount(){
     if(await this.handler.fetchBlocks()){
       if(this.loader !== null){
         this.loader.dismiss(<Content ref={(content)=>this.content = content}/>, true);
-
-        var sortedBlockKeys = Object.keys(this.handler.state.blocks).sort((a, b)=>{return b - a;})
-        this.content.setSortedBlockKeys(sortedBlockKeys);
-        this.content.setBlocks(this.handler.state.blocks);
         this.content.setAddressBook(this.handler.state.addressBook);
       }
     } else {
