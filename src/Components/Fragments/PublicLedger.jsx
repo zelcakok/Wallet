@@ -169,16 +169,31 @@ class Content extends Component {
     )
   }
 
+  fillTransInfoRow=(payment)=>{
+    return (
+      <TableRow key={payment.id}>
+        <TableCell>{this.state.addressBook[payment.payerAddr].email.split("@")[0]}</TableCell>
+        <TableCell>{this.state.addressBook[payment.payeeAddr].email.split("@")[0]}</TableCell>
+        <TableCell>{moment(payment.timestamp).format("DD/MM/YY hh:mm:ss A")}</TableCell>
+        <TableCell numeric>{parseFloat(payment.amount).toFixed(2)}</TableCell>
+      </TableRow>
+    )
+  }
+
   fillTransInfo=(blockAddr, block)=>{
     if(!block.hasOwnProperty("payload"))
       return (
         <div style={{color:"grey", textAlign:"center"}}>There is no transaction.</div>
       )
-    var payload = JSON.parse(block.payload);
-    var payment = payload.payment;
+    var payloads = JSON.parse(block.payload);
+    var transInfoRows = [];
+    payloads.forEach((payload)=>{
+      var payment = JSON.parse(payload).payment;
+      transInfoRows.push(this.fillTransInfoRow(payment));
+    })
     return (
       <Paper style={{overflowX:"auto"}}>
-        <Table style={{maxWidth:window.innerWidth*0.5+"px"}}>
+        <Table>
           <TableHead>
             <TableRow>
               <TableCell>Payer</TableCell>
@@ -188,12 +203,7 @@ class Content extends Component {
             </TableRow>
           </TableHead>
           <TableBody>
-            <TableRow key={payment.id}>
-              <TableCell>{this.state.addressBook[payment.payerAddr].email.split("@")[0]}</TableCell>
-              <TableCell>{this.state.addressBook[payment.payeeAddr].email.split("@")[0]}</TableCell>
-              <TableCell>{moment(payment.timestamp).format("DD/MM/YY hh:mm:ss A")}</TableCell>
-              <TableCell numeric>{parseFloat(payment.amount).toFixed(2)}</TableCell>
-            </TableRow>
+            { transInfoRows }
           </TableBody>
         </Table>
       </Paper>

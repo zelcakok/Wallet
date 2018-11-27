@@ -72,15 +72,16 @@ class Content extends Component {
 
   setLedger=(ledger)=>{
     var records = this.state.ledger;
-    Object.keys(ledger).map((paymentID)=>{
+    var paymentIDs = Object.keys(ledger);
+    for(var i=paymentIDs.length-1; i>=0; i--){
       var row = null;
-      var payment = ledger[paymentID];
+      var payment = ledger[paymentIDs[i]];
       if(payment.delta > 0)
-        row = this.createData(paymentID, "Receive", payment.name, "You", moment(payment.timestamp).format("DD/MM/YY hh:mm A"), payment.delta);
+        row = this.createData(paymentIDs[i], "Receive", payment.name, "You", moment(payment.timestamp).format("DD/MM/YY hh:mm:ss A"), payment.delta);
       else
-        row = this.createData(paymentID, "Pay", "You", payment.name, moment(payment.timestamp).format("DD/MM/YY hh:mm A"), Math.abs(payment.delta));
+        row = this.createData(paymentIDs[i], "Pay", "You", payment.name, moment(payment.timestamp).format("DD/MM/YY hh:mm:ss A"), Math.abs(payment.delta));
       records.push(row);
-    })
+    }
     this.setState({ledger: records});
   }
 
