@@ -1,16 +1,20 @@
+//ReactJS
 import React, { Component } from 'react';
+
+//Material UI
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+
+//Libraries
 import Swal from 'sweetalert2';
 
 //Colors
 import red from '@material-ui/core/colors/red';
 
+//Self Libraries
 import Authenticator from './Authenticator';
 
 class AppTopBar extends Component {
@@ -57,7 +61,7 @@ class AppTopBar extends Component {
       <AppBar position="static" style={{backgroundColor:red[500]}}>
         <Toolbar>
           <Typography variant="h6" color="inherit" style={{flex:1}}>
-            Wallet
+            My Wallet
           </Typography>
           <IconButton color="inherit" onClick={this.navLogin}>
             <AccountCircleIcon style={{marginRight:"2px"}}/>

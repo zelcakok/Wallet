@@ -1,12 +1,10 @@
+//ReactJS
 import React, { Component } from 'react';
 
 //Material UI
 import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
 import CardHeader from '@material-ui/core/CardHeader';
-import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
@@ -18,20 +16,11 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import TableFooter from '@material-ui/core/TableFooter';
-import TablePagination from '@material-ui/core/TablePagination';
 import Paper from '@material-ui/core/Paper';
-import IconButton from '@material-ui/core/IconButton';
-import FirstPageIcon from '@material-ui/icons/FirstPage';
-import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
-import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
-import LastPageIcon from '@material-ui/icons/LastPage';
-
 import MoneyIcon from '@material-ui/icons/AttachMoney';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import AtmIcon from '@material-ui/icons/Atm';
 
+//Libraries
 import crypto from 'crypto';
 import Swal from 'sweetalert2';
 import moment from 'moment';
@@ -39,6 +28,7 @@ import moment from 'moment';
 //Colors
 import red from '@material-ui/core/colors/red';
 
+//Self Libraries
 import Loader from './Loader';
 import Authenticator from '../Authenticator';
 import API from '../API';
@@ -133,7 +123,6 @@ class Content extends Component {
       if(result.hasOwnProperty("dismiss")) return;
       var payeeEmail = await this.auth.isLoggedIn();
       payeeEmail = payeeEmail.username+"@blockchain.com";
-      var email = "walletbank@blockchain.com";
       var password = result.value;
       var digest = crypto.createHash("sha256").update(payeeEmail+password).digest("hex");
       var payerAddr = this.getWalletBankWalletAddr();

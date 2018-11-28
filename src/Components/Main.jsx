@@ -1,18 +1,17 @@
+//ReactJS
 import React, { Component } from 'react';
-import Grid from '@material-ui/core/Grid';
 
+//Libraries
+import EventEmitter from 'events';
+import { BrowserRouter as Router, Route } from "react-router-dom";
+
+//Self Libraries
 import AppTopBar from './AppTopBar';
 import Frame from './Frame';
 import AppBottomBar from './AppBottomBar';
-
 import Login from './Login';
-
 import Authenticator from './Authenticator';
 import API from './API';
-
-import EventEmitter from 'events';
-
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 class Content extends Component {
   constructor(props){
@@ -129,7 +128,7 @@ class Main extends Component {
       await this.fetchData();
       setInterval(async ()=>{
         await this.fetchData();
-      }, 1000 * 1);
+      }, 1000 * 10);
     })();
   }
 

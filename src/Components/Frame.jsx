@@ -1,5 +1,7 @@
+//ReactJS
 import React, { Component } from 'react';
 
+//Self Libraries
 import Payment from './Fragments/Payment';
 import Balance from './Fragments/Balance';
 import PublicLedger from './Fragments/PublicLedger';
@@ -8,6 +10,7 @@ import Miners from './Fragments/Miners';
 const FRAGMENT_PAYMENT = 1;
 const FRAGMENT_BALANCE = 0;
 const FRAGMENT_PUBLICLEDGER = 2;
+// eslint-disable-next-line
 const FRAGMENT_MINERS = 3;
 
 const RATIO = 0.81;

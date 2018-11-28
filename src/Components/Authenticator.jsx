@@ -1,3 +1,4 @@
+//Libraries
 import firebase from 'firebase';
 
 class Authenticator {

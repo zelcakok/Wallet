@@ -1,14 +1,11 @@
+//ReactJS
 import React, { Component } from 'react';
 
 //Material UI
 import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
 import CardHeader from '@material-ui/core/CardHeader';
-import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
 import CreditCardIcon from '@material-ui/icons/CreditCard';
 import AccountBalanceWalletIcon from '@material-ui/icons/AccountBalanceWallet';
@@ -25,6 +22,7 @@ import crypto from 'crypto';
 //Colors
 import red from '@material-ui/core/colors/red';
 
+//Self Libraries
 import API from '../API';
 import Authenticator from '../Authenticator';
 import Loader from './Loader';
@@ -113,7 +111,6 @@ class Content extends Component {
       email = email.username + "@blockchain.com";
       var password = result.value;
       var digest = crypto.createHash("sha256").update(email+password).digest("hex");
-      var payerAddr = this.state.walletAddr;
       var payeeAddr = this.state.payeeAddr;
       var amount = this.state.paymentAmount;
       API.payment({

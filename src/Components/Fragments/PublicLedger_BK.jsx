@@ -1,6 +1,9 @@
+//ReactJS
 import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
+
+//Material UI
 import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -15,21 +18,20 @@ import Paper from '@material-ui/core/Paper';
 import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
-import DeleteIcon from '@material-ui/icons/Delete';
-import FilterListIcon from '@material-ui/icons/FilterList';
 import { lighten } from '@material-ui/core/styles/colorManipulator';
-
 import TextField from '@material-ui/core/TextField';
 import Button  from '@material-ui/core/Button';
 import Grid  from '@material-ui/core/Grid';
-
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
+import DeleteIcon from '@material-ui/icons/Delete';
+import FilterListIcon from '@material-ui/icons/FilterList';
 import ViewIcon from '@material-ui/icons/RemoveRedEye';
 
+//Libraries
 import moment from 'moment';
 
 //Colors

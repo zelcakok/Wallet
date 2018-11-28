@@ -1,47 +1,15 @@
+//ReactJS
 import React, { Component } from 'react';
 
 //Material UI
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
-import Divider from '@material-ui/core/Divider';
 import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import TextField from '@material-ui/core/TextField';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
 import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
-import Button from '@material-ui/core/Button';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import Avatar from '@material-ui/core/Avatar';
-
-import BlockIcon from '@material-ui/icons/Dashboard';
-
 
 //Libraries
-import QRCode from 'qrcode.react';
-import QrReader from "react-qr-reader";
-import Swal from 'sweetalert2';
-import crypto from 'crypto';
 import moment from 'moment';
 
-//Colors
-import red from '@material-ui/core/colors/red';
-
-import API from '../API';
-import Authenticator from '../Authenticator';
+//Self Libraries
 import Loader from './Loader';
 
 class Content extends Component {

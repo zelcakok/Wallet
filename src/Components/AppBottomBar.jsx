@@ -1,19 +1,14 @@
+//ReactJS
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+
+//Material UI
 import BottomNavigation from '@material-ui/core/BottomNavigation';
 import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
 import AccountBalanceWalletIcon from '@material-ui/icons/AccountBalanceWallet';
 import PaymentIcon from '@material-ui/icons/Payment';
 import ChromeReaderModeIcon from '@material-ui/icons/ChromeReaderMode';
 import MinersIcon from '@material-ui/icons/Adb';
-import Badge from '@material-ui/core/Badge';
-
 import Divider from '@material-ui/core/Divider';
-import Frame from './Frame';
-
-
-//Colors
 import red from '@material-ui/core/colors/red';
 
 class AppBottomBar extends Component {

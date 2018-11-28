@@ -1,24 +1,15 @@
+//ReactJS
 import React, { Component } from 'react';
 
 //Material UI
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import Divider from '@material-ui/core/Divider';
 import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -26,22 +17,11 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Avatar from '@material-ui/core/Avatar';
-
 import BlockIcon from '@material-ui/icons/Dashboard';
-
-
-//Libraries
-import QRCode from 'qrcode.react';
-import QrReader from "react-qr-reader";
-import Swal from 'sweetalert2';
-import crypto from 'crypto';
 import moment from 'moment';
-
-//Colors
 import red from '@material-ui/core/colors/red';
 
-import API from '../API';
-import Authenticator from '../Authenticator';
+//Self Libraries
 import Loader from './Loader';
 
 class Content extends Component {
@@ -161,7 +141,7 @@ class Content extends Component {
         <TextField style={{marginBottom:"2%"}} variant="outlined" label="Block Address" value={blockAddr} fullWidth disabled/>
         <TextField style={{marginBottom:"2%"}} variant="outlined" label="Hash of block" value={block.hash} fullWidth disabled/>
         <TextField style={{marginBottom:"2%"}} variant="outlined" label="Hash of previous block" value={block.prevHash ? block.prevHash : "No previous block for the genesis block."} fullWidth disabled/>
-        <TextField style={{width:"50%"}} variant="outlined" label="Time of creation (24)" value={moment(block.timestamp).format("DD/MM/YY HH:mm:ss")} fullWidth disabled/>
+        <TextField style={{width:"50%"}} variant="outlined" label="Time of creation (24)" value={ block.timestamp ? moment(block.timestamp).format("DD/MM/YY HH:mm:ss") : moment("1993-12-31T00:00:00").format("DD/MM/YY HH:mm:ss") } fullWidth disabled/>
         <TextField style={{width:"20%"}} variant="outlined" label="Target" value={block.target ? block.target : "NUL"} fullWidth disabled/>
         <TextField style={{width:"30%"}} variant="outlined" label="Nonce" value={block.nonce ? block.nonce : "NUL"} fullWidth disabled/>
         <TextField style={{marginTop:"2%"}} variant="outlined" label="Merkle Root" value={block.merkleRoot ? block.merkleRoot : "There is no transaction."} fullWidth disabled/>
@@ -225,6 +205,9 @@ class Content extends Component {
       <Grid container spacing={8} justify="flex-start">
         {
           (this.state.sortedBlockKeys).map((blockAddr)=>{
+
+            console.log("CHECK THIS", blockAddr);
+
             return (
               <Grid item key={blockAddr+"_item"}>
                 {this.genBlockCard(blockAddr, JSON.parse(this.state.blocks[blockAddr]))}
@@ -247,6 +230,7 @@ class PublicLedger extends Component {
   invalidate=()=>{
     if(this.content === null) return;
     var sortedBlockKeys = Object.keys(this.handler.state.blocks).sort((a, b)=>{return b - a;})
+    this.content.setBlocks(null);
     this.content.setSortedBlockKeys(sortedBlockKeys);
     this.content.setBlocks(this.handler.state.blocks);
   }
