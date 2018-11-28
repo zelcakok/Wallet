@@ -51,7 +51,7 @@ class Content extends Component {
           (this.state.preBlocks).map((payment)=>{
             return (
               <Grid item key={payment.id}>
-                <Card style={{width:600}}>
+                <Card style={{width: window.innerWidth > 600 ? 600 : window.innerWidth * 0.95}}>
                   <CardContent>
                     <Grid container spacing={16} direction="row" justify="flex-start" alignItems="center">
                       <Grid item xs={6} style={{fontWeight:"bold"}}>Payer</Grid>

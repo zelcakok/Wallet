@@ -33,6 +33,8 @@ import Loader from './Loader';
 import Authenticator from '../Authenticator';
 import API from '../API';
 
+var SHOW_RECORDS_NUM = 10;
+
 class Content extends Component {
   constructor(props){
     super(props);
@@ -68,6 +70,7 @@ class Content extends Component {
   }
 
   setLedger=(ledger)=>{
+    var count = 0;
     var records = [];
     var paymentIDs = Object.keys(ledger);
     for(var i=paymentIDs.length-1; i>=0; i--){
@@ -77,6 +80,8 @@ class Content extends Component {
         row = this.createData(paymentIDs[i], "Receive", payment.name, "You", moment(payment.timestamp).format("DD/MM/YY hh:mm:ss A"), payment.delta);
       else
         row = this.createData(paymentIDs[i], "Pay", "You", payment.name, moment(payment.timestamp).format("DD/MM/YY hh:mm:ss A"), Math.abs(payment.delta));
+      count++;
+      if(count >= SHOW_RECORDS_NUM) break;
       records.push(row);
     }
     this.setState({ledger: records});
@@ -166,7 +171,7 @@ class Content extends Component {
                 <MoneyIcon/>
               </Avatar>
             }
-            title="Balance" subheader={"The last 30 records will be shown here."}/>
+            title="Balance" subheader={"The last "+SHOW_RECORDS_NUM+" records will be shown here."}/>
           <CardContent style={{textAlign:"center"}}>
             <Grid container direction="row" justify="space-between">
               <Grid item>
